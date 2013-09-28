@@ -1,0 +1,8 @@
+#!/bin/sh
+cd ~/C/solver/&&
+make clean && make &&
+cd ~/Java/jni && 
+make clean && make 
+#javah -classpath ../../ -jni coho.jni.CCohoLP  
+#java -Djava.library.path=./ -classpath ../../ coho.jni.CCohoLPSolver
+

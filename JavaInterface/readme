@@ -1,0 +1,12 @@
+This package create a pipe between Java and Matlab threads, such that Java functions can be used in Matlab. The Java program supports 
+  1. lp & project solver
+    java_lpProject.m
+    java_lpSolve.m
+  2. polygon operations 
+    java_polyContain.m
+    java_polyIntersect.m
+    java_polySimplify.m
+    java_polyUnion.m
+  3. get/set parameters 
+    java_getParams.m
+    java_setParams.m

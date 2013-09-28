@@ -1,0 +1,7 @@
+# How to init cplex
+use cplex-10.1.1
+ILOG_LICENSE_FILE=/cs/local/generic/lib/pkg/ilog/ilm/access.ilm
+export ILOG_LICENSE_FILE
+
+# How to release cplex license
+clear cplexint;

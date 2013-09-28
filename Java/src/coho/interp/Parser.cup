@@ -1,0 +1,144 @@
+// CUP specifiation for a simple calculator
+
+import java_cup.runtime.*;
+import java.util.concurrent.*;
+
+action code {:
+  void enqueue(PTeval nd) {
+	try{
+		bq.put(nd);
+	}catch(InterruptedException e){
+		System.err.println("Errors while putting PTeval to the queue: "+e.toString());
+	}	
+  }
+  PTfactory pf;
+  BlockingQueue<PTeval> bq;
+  CUP$Parser$actions(Parser _parser, PTfactory _pf, BlockingQueue<PTeval> _bq) {
+  	parser=_parser;
+  	pf = _pf;
+  	bq = _bq;
+  }
+:};
+
+parser code {:
+  protected void init_actions_2(PTfactory pf, BlockingQueue<PTeval> bq)
+  { action_obj = new CUP$Parser$actions(this,pf,bq); }
+:};
+
+scan with {:
+  throw new RuntimeException("this method needs to be overridden");
+:};
+
+/* Terminals (tokens returned by the scanner). */
+terminal PTeval PLAIN_DOUBLE, HEX_DOUBLE, IDENT, STRING;
+terminal PTeval LPAREN, RPAREN, LBRACKET, RBRACKET;
+terminal PTeval COMMA, SEMI, MINUS, ASSIGN, LEX_ERROR;
+
+/* Non-terminals */
+non terminal PTnode statement, assignment, expr, row, rowTail, col, colTail, stateList;
+
+/* The grammar */
+
+start with stateList;
+
+stateList   ::= stateList:l statement:s
+		    {: enqueue((PTeval)s);
+		    :}
+		| statement:s
+		    {: enqueue((PTeval)s);
+		    :}
+		;
+
+statement	::= assignment:a SEMI:s
+		    {:  RESULT = pf.create(Sym.statement, new PTnode[] {a,s});
+		    //System.out.println("statement: assignment SEMI\n");
+		    :}
+		|   expr:e SEMI: s
+		    {:  RESULT = pf.create(Sym.statement, new PTnode[] {e,s});
+			//System.out.println("statement: expr SEMI\n");
+		    :}
+		;
+
+assignment	::= IDENT:id ASSIGN:a expr:e
+		    {:  RESULT = pf.create(Sym.assignment,
+					    new PTnode[] {id, a, e});
+				//System.out.println("assignment: IDENT ASSIGN expr\n");
+		    :}
+		;
+
+expr		::= PLAIN_DOUBLE:x
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {x});
+			//System.out.println("expr: PLAIN_DOUBLE");
+		    :}
+		|   HEX_DOUBLE:x
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {x});
+		    //System.out.println("expr: HEX_DOUBLE\n");
+		    :}
+		|   IDENT:x
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {x});
+		    //System.out.println("expr: IDENT\n");
+		    :}
+		|   IDENT:id LPAREN:l row:x RPAREN:r
+		    {:  RESULT = pf.create(Sym.expr,
+					    new PTnode[] {id, l, x, r});
+			//System.out.println("expr: IDENT LPAREN row RPAREN\n");		    
+		    :}
+		|   STRING:x
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {x});
+		    //System.out.println("expr: STRING\n");
+		    :}
+		|   LPAREN:l expr:x RPAREN:r
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {l, x, r});
+		    //System.out.println("expr: LPAREN expr RPAREN\n");
+		    :}
+		|   LBRACKET:l row:x RBRACKET:r
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {l, x, r});
+		    //System.out.println("expr: LBRACKET row RBRACKET\n");
+		    :}
+		|   LBRACKET:l col:x RBRACKET:r
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {l, x, r});
+		    //System.out.println("expr: LBRACKET col RBRACKET\n");
+		    :}
+		|   MINUS:m expr:x
+		    {:  RESULT = pf.create(Sym.expr, new PTnode[] {m, x});
+		    //System.out.println("expr: MINUS expr\n");
+		    :}
+		;
+
+
+/* The syntax could be made simpler by replacing row: expr COMMA rowTail
+ * with row: expr COMMA row.  The formulation here allows more row and
+ * column evalution to share the same code.
+ */
+row		::= /* empty */
+		    {:  RESULT = pf.create(Sym.row, new PTnode[] {});
+		    :}
+		|   expr:x
+		    {:  RESULT = pf.create(Sym.row, new PTnode[] {x});
+		    :}
+		|   expr:x COMMA:c rowTail:t
+		    {:  RESULT = pf.create(Sym.row, new PTnode[] {x, c, t});
+		    :}
+		;
+rowTail		::= expr:x
+		    {:  RESULT = pf.create(Sym.rowTail, new PTnode[] {x});
+		    :}
+		|   expr:x COMMA:c rowTail:t
+		    {:  RESULT = pf.create(Sym.rowTail, new PTnode[] {x, c, t});
+		    :}
+		;
+
+/* A column cannot be empty or contain 1 element, or it's called a row;
+   so [ 1; ] is probably illegal, but we are unlikely to need it.
+*/
+col		::= expr:x SEMI:s colTail:t
+		    {:  RESULT = pf.create(Sym.col, new PTnode[] {x, s, t});
+		    :}
+		;
+colTail		::= expr:x
+		    {:  RESULT = pf.create(Sym.colTail, new PTnode[] {x});
+		    :}
+		|   expr:x SEMI:c colTail:t
+		    {:  RESULT = pf.create(Sym.colTail, new PTnode[] {x, c, t});
+		    :}
+		;

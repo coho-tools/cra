@@ -1,0 +1,37 @@
+This package provide polygon operations. There are two solvers: java/matlab. The matlab solver is based on the SAGA matlab packages, with some modifications. The SAGA solver is not robust enough.  
+
+It provides the following functions:
+
+// Create polygons
+	poly_create      : create a polygon
+	poly_createByBox : create a rectagle for a bounding box
+	poly_rand        : create a random polygon
+	poly_regu        : create an over-approximated regular polygon for in-regular polygons  
+
+// Polygon operations
+	poly_intersect   : intersection of two/more polygons
+	poly_union       : union of two/more polygons
+	poly_simplify    : simplify the polygon (reduce # of vertices) 
+	poly_contain     : test if polygon A contains polygons B
+	poly_containPts  : test if polygon A contains points 
+	poly_intersectLine: intersection of polygon and lines/segments
+
+// Basic utilities	
+	poly_area        : polygon area
+	poly_ptsDist     : min distance between a point and a polygon
+	poly_convexHull  : convex hull of a polygon
+	poly_display     : display a polygon
+	polys_display    : display a set of polygons
+
+// Functions specified for CRA	
+	poly_interval    : interval closure calculation
+	poly_breakLongEdge: break a long edge into smaller pieces
+
+// Implemented, but not used yet.	
+	poly_orh         : find an oriented rectangular hull
+	poly_isCCW       : is the polygon vertices in counter-clock-wise order
+	poly_convert     : change the vertices order 
+	poly_split       : split a polygon into polylines
+	polyline_crop    : crop a polyline given a range
+	line_intersect   : intersection of lines/segments
+	poly_isSimple    : test a polygon is simple or not (not implemented yet, don't know good algorithm). 
