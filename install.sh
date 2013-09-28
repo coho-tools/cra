@@ -54,7 +54,7 @@ echo "
 %     license:   CRA license
 %  Ex: 
 %     info = cra_info;  // return the structure
-%     has_cplex = 0; // has the value
+%     has_cplex = cra_info('has_cplex'); // has the value
 function val = cra_info(field)
   % NOTE: I use global vars because of the Matlab 2013 bug. 
 	%       (Persistent vars re-inited upon the first path changes)
@@ -118,7 +118,6 @@ function  info = cra_info_init
                 'user',user, 'has_cplex', has_cplex, ...
                 'sys_path', sys_path, 'fork_bin', fork_bin, ...
                 'java_classpath', java_classpath); 
-
 end % cra_info
 " > cra_info.m
 
