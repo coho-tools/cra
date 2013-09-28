@@ -9,7 +9,7 @@
 %     license:   CRA license
 %  Ex: 
 %     info = cra_info;  // return the structure
-%     has_cplex = 1; // has the value
+%     has_cplex = 0; // has the value
 function val = cra_info(field)
   % NOTE: Because of the Matlab 2013 version bug, I have to use global vars. 
   %       Please don't modify the value by other functions. 
