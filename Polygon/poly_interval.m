@@ -25,11 +25,13 @@ bbox1 = [min(points,[],2),max(points,[],2)];
 
 % consider computation error
 if(~isempty(bbox1))
-	tol = eps*10;
-	assert(all(bbox1(:,1)+tol>=bbox(:,1))&all(bbox1(:,2)-tol<=bbox(:,2)));
+	% Possible because of computation error
+	%tol = 1e-12; %eps*10;
+	%assert(all(bbox1(:,1)+tol>=bbox(:,1))&all(bbox1(:,2)-tol<=bbox(:,2)));
 	bbox = [max(bbox1(:,1),bbox(:,1)),min(bbox1(:,2),bbox(:,2))];
 else
-	bbox = bbox1; % []
+	%bbox = bbox1; % []
+	bbox = zeros(0,2);
 end
 
 % NOTE, computing the intersection of poly and bbox is not correct. 

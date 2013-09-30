@@ -35,7 +35,7 @@ function test_3vdp
 	opt = ph_getOpt; 
 	opt = ph_setOpt(opt,'maxBloat',0.1);
 	opt = ph_setOpt(opt,'timeStep',0.05); 
-	maxT = [7,7,2];
+	maxTs = [7,7,2];
 
 	disp('Perform the reachability computations with different configurations:'); 
 	disp('Try with different projectagon types: non-convex, convex and bbox.'); 
@@ -47,11 +47,11 @@ function test_3vdp
 	for p = 1:length(initPhs)
 		initPh = initPhs{p}; objects = OBJ{p}; maxT = maxTs(p);
 		% try all possible combinations
-		%for i=1:length(objects)
-		for i=4:length(objects)
+		for i=1:length(objects)
+		%for i=4:length(objects)
 			opt = ph_setOpt(opt,'object',objects{i});
-			%for j=1:length(models)
-			for j=length(models)
+			for j=1:length(models)
+			%for j=length(models)
 				disp('------------------------');
 				fprintf('Using projectagon %d, object %d, model %d\n',p,i,j);
 				opt = ph_setOpt(opt,'model',models{j});
@@ -62,6 +62,10 @@ function test_3vdp
 					fprintf('Working on the %dth step at time %f\n',k,t); 
 					[fwdPh,ph,opt] = ph_advanceSafe(ph,opt); 
 					%[fwdPh,ph,opt] = ph_advance(ph,opt); 
+					if(j==3 && ph.fwd.timeStep < opt.timeStep)
+						% The timeStep is too large, reduce it.
+						opt.timeStep = 0.9*opt.timeStep;
+					end
 					t = t+ph.fwd.timeStep;
 					phs{k} = ph; 
 					ph = fwdPh;	

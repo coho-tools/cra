@@ -5,6 +5,7 @@ if(nargin<1||ph_isempty(ph))
 	error('The input projectagon is empty');
 end
 if(nargin<2), opt = []; end
+
 try 
 	fail = false;
 	[fwdPh,ph,opt] = ph_advance(ph,opt);
@@ -26,28 +27,31 @@ catch ME
 		case lower('COHO:Projectagon:LargeTimeStep')
 			newOpt = opt;
 			timeStep = str2double(ME.message);
-			if(opt.timeStep<=timeStep) %IT may fail again because of computation error of realBloatAmt
-				newOpt.model='bloatAmt';
-			else
-				newOpt.timeStep = timeStep; 
-			end
+			newOpt.timeStep = timeStep; 
+%			if(opt.timeStep<=timeStep) 
+%				% It may fail again because of computation error of realBloatAmt
+%				newOpt.model='bloatAmt';
+%			else
+%				newOpt.timeStep = timeStep; 
+%			end
 		case lower('COHO:Projectagon:EmptyProjection') 
 			% lp_createByHull may return under-approximated result.
 			% therefore, faceLP might be infeasible (feasible to cplex, but not to java)
 			% this cause empty projection polygon. Therefore, we use face-bloat here. 
 			newOpt = ph_safeOpt(opt);
-			%ph.iscanon = false; ph = ph_simplify(ph);  % over approximate initial region
-			%ph = ph_canon(ph); ph = ph_simplify(ph,1e-6); % remove very short edge
 		otherwise
 			rethrow(ME); 
 			%error('unknown exceptions');
 	end
+
 	% try again with new opt
 	try
 		[fwdPh,ph,newOpt] = ph_advance(ph,newOpt);
 	catch ME2
 		log_write(sprintf('Exception %s found in ph_advance',ME.identifier),true);
-		log_save(ME.identifier,'ph','opt','ME2');
+	  if(~isempty(ME.identifier))
+		  log_save(ME.identifier,'ph','opt','ME2');
+		end
 		% switch to use convex projectagon if fails again
 		if(ph.type==0)
 			ph = ph_convert(ph,1);
@@ -57,6 +61,7 @@ catch ME
 			rethrow(ME2);
 		end
 	end
+
 	% NOTE return the old one.
 	opt.prevBloatAmt = newOpt.prevBloatAmt;
 	opt.prevTimeStep = newOpt.prevTimeStep;
