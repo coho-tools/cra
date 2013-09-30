@@ -1,6 +1,8 @@
 function test_ph_forward
+  disp('**** 2D Sink example ****');
 	% a 2d exampels
 	%test_sink;
+  disp('**** 3D VDP example  ****');
 	% a 3d exampels
 	test_3vdp;
 
@@ -24,45 +26,51 @@ function test_3vdp
 	cra_cfg('set','projSolver','java');	
 
 	% methods of ph_advance	
-	OBJ{1} = {'face-bloat','face-none','face-height','face-all'};
-	OBJ{2} = {'face-bloat','face-none','face-height','face-all','ph'};
-	OBJ{3} = {'face-bloat','face-none','face-height','face-all','ph'};
-	models = {'guess-verify','timeStep','bloatAmt'};
+	OBJ{1} = {'face-bloat','face-height','face-none','face-all'};
+	OBJ{2} = {'face-bloat','face-height','face-none','face-all','ph'};
+	OBJ{3} = {'face-bloat','face-height','face-none','face-all','ph'};
+	models = {'guess-verify','bloatAmt','timeStep'};
 
 	% set opt
 	opt = ph_getOpt; 
 	opt = ph_setOpt(opt,'maxBloat',0.1);
-	opt = ph_setOpt(opt,'timeStep',0.04); 
-	maxTs = [7,7,2]; 
+	opt = ph_setOpt(opt,'timeStep',0.05); 
+	maxT = [7,7,2];
+
+	disp('Perform the reachability computations with different configurations:'); 
+	disp('Try with different projectagon types: non-convex, convex and bbox.'); 
+	disp('Try with different advance face: face-bloat,face-height,face-none,face-all, ph'); 
+	disp('Try with different modeling methods: guess-verify, bloatAmt, timeStep'); 
+	disp('The computation will take long time');
 
 	% compute reachability region
 	for p = 1:length(initPhs)
 		initPh = initPhs{p}; objects = OBJ{p}; maxT = maxTs(p);
 		% try all possible combinations
-		for i=1:length(objects)
+		%for i=1:length(objects)
+		for i=4:length(objects)
 			opt = ph_setOpt(opt,'object',objects{i});
-			for j=1:length(models)
+			%for j=1:length(models)
+			for j=length(models)
 				disp('------------------------');
 				fprintf('Using projectagon %d, object %d, model %d\n',p,i,j);
 				opt = ph_setOpt(opt,'model',models{j});
 				opt = ph_setOpt(opt,'prevBloatAmt',[],'prevTimeStep',[]);
 				ph = initPh;
-				fig(1) = figure; fig(2) = figure;
-				ph_display(ph,fig,[],[],'r');
 				phs = cell(0,1); t = 0;
 				for k=1:Inf 
 					fprintf('Working on the %dth step at time %f\n',k,t); 
 					[fwdPh,ph,opt] = ph_advanceSafe(ph,opt); 
 					%[fwdPh,ph,opt] = ph_advance(ph,opt); 
-					%if(k==3) error('debug'); end;
 					t = t+ph.fwd.timeStep;
 					phs{k} = ph; 
 					ph = fwdPh;	
-					ph_display(ph,fig,[],[],'b'); 
 					if(t>=maxT),break;end
 				end 
 				id = ['3vdp_',num2str(p),'_',num2str(i),'_',num2str(j)];
 				save(id,'phs','opt');
+				fig(1) = figure; fig(2) = figure;
+				phs_display(phs,fig);
 				print(fig(1),'-depsc2',[id,'_1']);
 				print(fig(2),'-depsc2',[id,'_2']);
 			end
@@ -121,10 +129,10 @@ function test_sink
 	initPhs{3}= ph_createByBox(dim,planes,bbox); % large error
 
 	% methods of ph_advance	
-	OBJ{1} = {'face-bloat','face-none','face-height','face-all'};
-	OBJ{2} = {'ph','face-bloat','face-none','face-height','face-all'};
-	OBJ{3} = {'ph','face-bloat','face-none','face-height','face-all'};
-	models = {'timeStep','bloatAmt','guess-verify'};
+	OBJ{1} = {'face-bloat','face-height','face-none','face-all'};
+	OBJ{2} = {'face-bloat','face-height','face-none','face-all','ph'};
+	OBJ{3} = {'face-bloat','face-height','face-none','face-all','ph'};
+	models = {'guess-verify','bloatAmt','timeStep'};
 
 	% set functions
 	cra_cfg('set','modelFunc',@sink_model);
@@ -138,6 +146,12 @@ function test_sink
 	opt = ph_setOpt(opt,'maxBloat',0.1);
 	opt = ph_setOpt(opt,'timeStep',0.05); % determinated from maxBloat
 	maxTs = [10,10,2]; % region is about 1e-8x1e-8
+
+	disp('Perform the reachability computations with different configurations:'); 
+	disp('Try with different projectagon types: non-convex, convex and bbox.'); 
+	disp('Try with different advance face: face-bloat,face-height,face-none,face-all, ph'); 
+	disp('Try with different modeling methods: guess-verify, bloatAmt, timeStep'); 
+	disp('The computation will take long time');
 
 	% compute reachability region
 	for p = 1:length(initPhs)

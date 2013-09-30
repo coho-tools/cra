@@ -34,6 +34,10 @@ echo ""
 echo "====Step5: Generating CRA configuration file ====" 
 cd $CRA_HOME
 while true; do 
+	echo "The commerical LP solver CPLEX may speedup the CRA computation."
+	echo "  We use the CPLEXINT interface to use CPLEX in Matlab." 
+	echo "  For more details, please check http://control.ee.ethz.ch/~hybrid/cplexint.php."
+	echo "  If you want to use CPLEX solver, please configurate your system to make cplexint.m under LinearProgramming/Solver/CPLEX work." 
 	read -p "Is CPLEX LP solver available in your system? " yn 
 	case $yn in 
 		[Yy]* ) has_cplex=1; break;; 
@@ -81,7 +85,6 @@ function  info = cra_info_init
     'Projectagon',
     'Projectagon/Ph',
     'Projectagon/Forward',
-    'Projectagon/Utils',
     'JavaInterface',
     'JavaInterface/Fork',
     'JavaInterface/Base',
@@ -121,11 +124,6 @@ function  info = cra_info_init
 end % cra_info
 " > cra_info.m
 
-#sed -e "s/has_cplex =.*;/has_cplex = $has_cplex;/g" foo > cra_info.m
-#cp cra_info.m foo
-#echo "Config CRA_HOME as `pwd`"
-#sed -e "s#cra_home = '.*';#cra_home='`pwd`';#g" foo > cra_info.m
-#rm foo
 echo "You can update the configurations later by editing cra_info.m file."
 
 echo ""
