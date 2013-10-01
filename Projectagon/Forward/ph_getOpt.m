@@ -23,7 +23,7 @@ function opt = ph_getOpt(type)
 % 	II. Parameters to compute face
 % 	'object': methods to compute object to advance, valid value includes
 % 			'ph': advance the whole projectagon, the type of projectagon 
-% 					can not be 'concave'. 
+% 					can not be 'non-convex'. 
 %			'face-all': advance all faces and project them onto all slices. 
 %			'face-none': advance faces of a slice and project them onto 
 %				their corresponding slice.
@@ -36,7 +36,7 @@ function opt = ph_getOpt(type)
 %			Increase the value will reduce the number of faces but increase 
 %			model error.
 %	'useInterval': indicate whether use the 'interval closure' method to find
-%			more accurate face or not for 'concave' projectagon. 
+%			more accurate face or not for 'non-convex' projectagon. 
 % 	III. Error control
 %	'tol': 	tolerrence used to simplify the polygons. 
 %	'riters','reps': To reduce model error, ph_advance repeats computation
@@ -47,7 +47,7 @@ function opt = ph_getOpt(type)
 %			error when computing models and advance faces. 
 %	'canonOpt': the parameters of ph_canon function. see ph_canon.
 %	'intervalOpt': the parameters of ph_interval function. see ph_interval.
-% 				useful only when ph is a concave projectagon.
+% 				useful only when ph is a non-convex projectagon.
 %	
 
 

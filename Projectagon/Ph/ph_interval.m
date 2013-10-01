@@ -11,7 +11,7 @@ assert(ph.iscanon);
 
 % do not need for type 1 and 2.
 switch(ph.type)
-	case 0 % concave 
+	case 0 % non-convex 
 		if(nargin<3||isempty(opt)) 
 			phOpt = cra_cfg('get','phOpt');
 			opt = phOpt.intervalOpt;

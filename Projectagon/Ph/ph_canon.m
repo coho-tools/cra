@@ -33,7 +33,8 @@ switch(ph.type)
 		
 		% trim infeasible region
 		lp = lp_and(ph.hullLP,lp); 
-		for iter=1:Inf
+		%for iter=1:Inf % to remove warning message
+		for iter=1:1e12
 			% make hull feasible
 			lph = ph_createByLP(ph.dim,ph.planes,lp); 
 			if(ph_isempty(lph)), ph = []; return; end;

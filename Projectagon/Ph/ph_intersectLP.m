@@ -1,14 +1,14 @@
 function ph = ph_intersectLP(ph,lp)
 % ph = ph_intersectLP(ph,lp)
 % This function computes the intersection of a projectagon and a lp. 
-% 	The output is not canonical if the input is a concave projectagon,
+% 	The output is not canonical if the input is a non-convex projectagon,
 % 	otherwise, it is canonical
 
 if(isempty(ph)), return; end
 if(nargin<2||isempty(lp)), return; end
 
 switch(ph.type)
-	case 0 % concave
+	case 0 % non-convex 
 		% make hull feasible 
 		lp = lp_and(ph.hullLP,lp);
 		lph = ph_createByLP(ph.dim,ph.planes,lp); 

@@ -11,7 +11,7 @@ if(ph_isempty(ph)), return; end
 
 % for interval
 switch(ph.type)
-	case {0,1} % concave/convex projectagon
+	case {0,1} % non-convex/convex projectagon
 		update = false;
 		hulls = ph.hulls; polys = ph.polys;
 		for i=1:ph.ns

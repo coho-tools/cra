@@ -37,7 +37,7 @@ type = min(types);
 
 % compute union
 switch(type)
-	case 0 % concave
+	case 0 % non-convex
 		polys = cell(ns,1); hulls = cell(ns,1);
 		for i=1:ns
 			ps = cell(np,1);

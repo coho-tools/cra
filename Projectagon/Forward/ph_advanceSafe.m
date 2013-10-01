@@ -41,7 +41,6 @@ catch ME
 			newOpt = ph_safeOpt(opt);
 		otherwise
 			rethrow(ME); 
-			%error('unknown exceptions');
 	end
 
 	% try again with new opt

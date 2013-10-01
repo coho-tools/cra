@@ -13,7 +13,7 @@ function test_3vdp
 	dim = 3; planes = [1,2;1,3]; 
 	bbox = [1.0,1.2;-0.05,0.05;0.9,1.1];
 	ph = ph_createByBox(dim,planes,bbox);
-	initPhs{1} = ph_convert(ph,'concave');
+	initPhs{1} = ph_convert(ph,'non-convex');
 	initPhs{2} = ph_convert(ph,'convex');
 	initPhs{3} = ph;
 
@@ -48,31 +48,29 @@ function test_3vdp
 		initPh = initPhs{p}; objects = OBJ{p}; maxT = maxTs(p);
 		% try all possible combinations
 		for i=1:length(objects)
-		%for i=4:length(objects)
 			opt = ph_setOpt(opt,'object',objects{i});
 			for j=1:length(models)
-			%for j=length(models)
 				disp('------------------------');
 				fprintf('Using projectagon %d, object %d, model %d\n',p,i,j);
+				opt = ph_setOpt(opt,'timeStep',0.05); % reset as may change below
 				opt = ph_setOpt(opt,'model',models{j});
 				opt = ph_setOpt(opt,'prevBloatAmt',[],'prevTimeStep',[]);
-				ph = initPh;
-				phs = cell(0,1); t = 0;
-				for k=1:Inf 
+				ph = initPh; phs = cell(0,1); t = 0; time = cputime;
+				for k=1:200 % max 200 steps
 					fprintf('Working on the %dth step at time %f\n',k,t); 
 					[fwdPh,ph,opt] = ph_advanceSafe(ph,opt); 
-					%[fwdPh,ph,opt] = ph_advance(ph,opt); 
 					if(j==3 && ph.fwd.timeStep < opt.timeStep)
-						% The timeStep is too large, reduce it.
-						opt.timeStep = 0.9*opt.timeStep;
+						disp('The timeStep is too huge, change to smaller ones');
+						opt = ph_setOpt(opt,'timeStep',0.9*opt.timeStep);
 					end
 					t = t+ph.fwd.timeStep;
 					phs{k} = ph; 
 					ph = fwdPh;	
 					if(t>=maxT),break;end
 				end 
+				time = cputime - time;
 				id = ['3vdp_',num2str(p),'_',num2str(i),'_',num2str(j)];
-				save(id,'phs','opt');
+				save(id,'phs','opt','time');
 				fig(1) = figure; fig(2) = figure;
 				phs_display(phs,fig);
 				print(fig(1),'-depsc2',[id,'_1']);
@@ -126,7 +124,7 @@ function test_sink
 	dim = 2; planes = [1,2]; 
 	polys = {[0.1, 0.35, 0.15, 0.1; 0.1, 0.1, 0.15, 0.35]};
 	hulls = { [ 0.1, 0.35, 0.1; 0.1, 0.1, 0.35 ] };
-	initPhs{1}= ph_create(dim,planes,hulls,polys,0,true);  % concave
+	initPhs{1}= ph_create(dim,planes,hulls,polys,0,true);  % non-convex 
 	hulls = { [ 0.1, 0.3, 0.4, 0.1; 0.1, 0.1, 0.4, 0.3 ] };
 	initPhs{2}= ph_create(dim,planes,hulls,hulls,1,true); % convex
 	bbox = [0.1,0.3;0.1,0.3];

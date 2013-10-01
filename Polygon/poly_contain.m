@@ -5,7 +5,7 @@ function isc = poly_contain(p1,p2,method)
 %  'points': p1 contains p2 <==> p1 contains all vertices of p2
 %  'intersect': p1 contains p2 <==> intersect(p1,p2) == p2 
 % 				<==> area(p2) == area(intersect(p1,p2))
-% The default points method may not be true for concave polygons.
+% The default points method may not be true for non-convex polygons.
 % But ususally it is true for non highly illed polygons.
 
 % special case

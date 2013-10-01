@@ -8,7 +8,7 @@ function ph = ph_create(dim,planes,hulls,polys,type,iscanon)
 % 			by orthogonal axises specified by planes(i,:) 
 %   hulls: hulls{i} is the matrix of 2D hull vertices for slice i
 %   polys: polys{i} is the matrix of 2D polygon vertices for slice i
-% 	type:  0. concave 1. convex 2. hyper-rectangle (0 by default)
+% 	type:  0. non-convex 1. convex 2. hyper-rectangle (0 by default)
 %   iscanon: true if polys are feasible to each other (false by default)
 %
 % ph is a structu with the following fileds
@@ -21,7 +21,7 @@ function ph = ph_create(dim,planes,hulls,polys,type,iscanon)
 % 	dim = 3; planes = [1,2; 2,3]; 
 % 	hulls{1} = poly1; hulls{2} = poly2;
 % 	ph = ph_create(dim,planes,hulls,[]); % create a convex non-canonical projectagon
-% 	ph = ph_create(dim,planes,hulls,polys); % create a concave non-canonical projectagon
+% 	ph = ph_create(dim,planes,hulls,polys); % create a non-convex non-canonical projectagon
 % 	ph = ph_create(dim,planes,hulls,polys,type,iscanon); 
 %
 if(nargin<3)
@@ -34,7 +34,7 @@ if(nargin<5)
 	if(isempty(polys))
 		type = 1; % convex
 	else
-		type = 0; % concave
+		type = 0; % non-convex 
 	end
 end
 if(nargin<6||isempty(iscanon))

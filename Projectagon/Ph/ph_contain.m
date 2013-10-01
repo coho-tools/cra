@@ -15,7 +15,7 @@ ns = ph1.ns;
 type = min(ph1.type,ph2.type);
 
 switch(type)
-	case 0 % concave
+	case 0 % non-convex 
 		for i=1:ns
 			isc = poly_contain(ph1.polys{i},ph2.polys{i});
 			if(~isc), return; end;
