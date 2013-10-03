@@ -18,5 +18,5 @@ function cra_rmpath
     disp(sprintf('  > %s',dirname));
     rmpath(dirname); 
   end
-  rmpath(cra_home); 
+  % rmpath(cra_home);  % leave the cra_home to call cra_open
 end %function cra_rmpath

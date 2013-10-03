@@ -1,0 +1,61 @@
+This package is the core of CRA. It has two parts:
+  Ph: Projectagon structures and its operations
+  Forwad: Compute forward reachable regions given LDI models (see Integer pkg).  
+## Ph packages
+# We support three types of projectagons
+ph_create       : create a general (non-convex) projectagon from polygons.
+ph_createByLP   : create a convex projectagon from lps.
+ph_createByBox  : create a bbox projectagon from  bounding box.
+ph_rand         : generate a random projectagon (mainly for test purpose).
+ph_convert      : convert the type of projectagons.
+ph_get          : get structure info.
+# operations
+ph_isempty      : check if the projectagon is empty or not
+ph_intersect    : intersection of two or more projectagons.
+ph_union        : union of two or more projectagons
+ph_intersectLP  : intersection of a projectagon and LP
+ph_intersectLine: intersection of a projectagon and line 
+                    (result is bloated to be a projectagon) 
+ph_simplify     : simplify the projectagon.
+ph_contain      : check if a projectagon contained by anoter one
+ph_containPts   : check if points are contained by a projectagon
+ph_project      : project a projectagon onto 2d subspaces
+ph_canon        : make the projectagon canonical
+ph_minkSum      : MinkSum operations (only support bbox now)
+ph_chplanes     : change the project planes a projectagon
+ph_promote      : promote a set of projectagons to have the same planes
+ph_interval     : interval closure calculation
+ph_regu         : make ill-conditioned projectagon a normal one 
+# display
+ph_display      : display a projectagon
+ph_display3d    : display a 3D projectagon in 3D space
+phs_display     : display a set of projectagon
+# misc
+ph_volumn       : volumn of a projectagon (based on random sampling)
+ph_ratio        : ration of two projectagons (based on poly areas)
+# move to CCW? 
+ph_derivative   : compute the Brockett annulus of varaibles.
+ph_derivativePt : compute the Brockett annulus based sampling points
+
+
+## Forward packages
+# options
+ph_getOpt       : get default options
+ph_checkOpt     : check if the option is correct 
+ph_setOpt       : update the options
+# forward
+ph_advance      : the main function to compute advanced projectagons
+ph_advanceSafe  : this function caches exceptions from ph_advance and 
+                    try with different options to continue the computations. 
+                    Exceptions may from over-approximation or computation error. 
+# basic step
+ph_smash        : break long edges and preprocess faces 
+ph_face         : prepare the face to be advanced (used by ph_model)
+ph_model        : create LDI modes for each face 
+ph_timeStep     : compute the max time step given the bloat amount
+ph_guess        : guesss a bloat amount and a time step
+ph_forward      : forward the projectagon
+ph_realBloatAmt : compute the real bloat amount (for guess-verify)
+ph_verify       : verify the pair of (timeStep, bloatAmt) is valid
+ph_construct    : construct the advanced projectagon
+ph_succ         : compute the reachable tube during time [t1,t2]
