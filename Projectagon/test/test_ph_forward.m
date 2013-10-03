@@ -88,8 +88,8 @@ function ldi = sink_model(lp)
 	% xdot = m*x
 	m = [-2,-3;3,-2];
 	A = m; b = zeros(2,1);
-	u = ones(2,1)*1e-6;
-	%u = zeros(2,1);
+	% NOTE: CRA doesn't allow error term "u" to be zero.
+	u = ones(2,1)*1e-6; %u = zeros(2,1);
 	ldi{1} = int_create(A,b,u);
 
 % 3D Van der Pol oscillator
