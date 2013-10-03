@@ -126,5 +126,4 @@ echo "You can update the configurations later by editing cra_info.m file."
 
 echo ""
 echo "COHO Reachabilty Analysis Tool Installed!" 
-echo "Please set environment variable CRA_HOME to install path before using CRA". 
 echo ""
