@@ -1,10 +1,10 @@
 function test_ph_forward
-  disp('**** 2D Sink example ****');
 	% a 2d exampels
+  disp('**** 2D Sink example ****');
 	test_sink;
-  disp('**** 3D VDP example  ****');
 	% a 3d exampels
-	%test_3vdp;
+  disp('**** 3D VDP example  ****');
+	test_3vdp;
 
 % 2D sink example.
 % This example shows how to use projectagon package
