@@ -85,14 +85,14 @@ function [val,status,update] = utils_struct(S,op,varargin)
 			end
 			update = true;
 			valids = coho_checkField(S,varargin(1:2:end));
-			% NOTE: it's ok.
 			if(strcmpi(op,'set')&&~all(valids)) 
+			  % NOTE: it's OK to add & set.
 				%warning('non-exist fields found'); 
 				%status = 1; return;	
 			end
 			if(strcmpi(op,'add')&&any(valids))
-				%warning('exist fields found');
-				%status = 1; return;	
+				warning('exist fields found');
+				status = 1; return;	
 			end
 			nvar = length(varargin)/2;
 			for i=1:nvar

@@ -95,8 +95,6 @@ function  info = cra_info_init
     'Polygon/SAGA',
     'Integrator',
     'Utils',
-    'Utils/BoundingBox',
-    'Utils/Preprocessor',
     'Utils/Logger'};
 
   % cplex is avail in the system
