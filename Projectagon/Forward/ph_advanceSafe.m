@@ -27,13 +27,8 @@ catch ME
 		case lower('COHO:Projectagon:LargeTimeStep')
 			newOpt = opt;
 			timeStep = str2double(ME.message);
-			newOpt.timeStep = timeStep; 
-%			if(opt.timeStep<=timeStep) 
-%				% It may fail again because of computation error of realBloatAmt
-%				newOpt.model='bloatAmt';
-%			else
-%				newOpt.timeStep = timeStep; 
-%			end
+      % It may fail again because of computation error of realBloatAmt
+			newOpt.timeStep = timeStep*0.9; 
 		case lower('COHO:Projectagon:EmptyProjection') 
 			% lp_createByHull may return under-approximated result.
 			% therefore, faceLP might be infeasible (feasible to cplex, but not to java)

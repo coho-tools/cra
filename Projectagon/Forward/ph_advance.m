@@ -34,27 +34,33 @@ switch(lower(opt.model))
 		end
 		ph = ph_model(ph,bloatAmt);
 		[timeStep,ph] = ph_timeStep(ph);
-		while(true)
-		  ph = ph_forward(ph,timeStep);
-		  [valid,ph] = ph_verify(ph);
-		  % NOTE valid may be false because of computation error in ph_verify
-			if(~valid)
-				timeStep = timeStep * 0.9; % reduce timeStep;
-			else
-				break; 
-			end
-		end
+		ph = ph_forward(ph,timeStep);
+		[valid,ph] = ph_verify(ph);
+    %% NOTE valid may fail because of over-approx in realBloatAmt; 
+		%% For example: ph_simplify increases the poly_area slightly, 
+		%% but may change the ph_realBloatAmt significantly. 
+%%		while(~valid)
+%%		  %%log_write('WARN:: Verify failed for model bloatAmt.'); 
+%%		  timeStep = timeStep * 0.9; % reduce timeStep;
+%%		  ph = ph_forward(ph,timeStep);
+%%		  [valid,ph] = ph_verify(ph);
+%%		end
 	case 'timestep' % fixed timeStep
 		bloatAmt = maxBloat*ones(dim,2);
 		timeStep = opt.timeStep;
 		ph = ph_model(ph,bloatAmt);
 		ph = ph_forward(ph,timeStep);
 		[valid,ph] = ph_verify(ph);
+    %% NOTE valid may fail because of over-approx in realBloatAmt; 
 		if(~valid)
 			timeStep = ph_timeStep(ph);
-			msg = num2str(timeStep); % return the maximum timeStep
-			exception = MException('COHO:Projectagon:LargeTimeStep',msg); 
-			throw(exception);
+			if(timeStep > opt.timeStep)
+			  msg = num2str(timeStep); % return the maximum timeStep
+			  exception = MException('COHO:Projectagon:LargeTimeStep',msg); 
+			  throw(exception);
+			else
+		    %%log_write('WARN:: Verify failed for model timeStep.'); 
+			end
 		end
 	case 'guess-verify'
 		while(true)
@@ -72,22 +78,19 @@ end
 
 % Try to reduce model error
 for i=1:opt.riters
-  tmpPh = ph; 
 	% compare the bloat region
-	bbox1 = sum(tmpPh.fwd.realBloatAmt,2);
-	bbox2 = sum(tmpPh.fwd.bloatAmt,2);
+	bbox1 = diff(ph.fwd.realBloatAmt,[],2);
+	bbox2 = diff(ph.fwd.bloatAmt,[],2);
 	r = prod(bbox1./bbox2)^(1/dim);
-	if(1-r>opt.reps), break; end
-	tmpBloatAmt = min(tmpPh.fwd.realBloatAmt,maxBloat);
-	tmpPh = ph_model(tmpPh,tmpBloatAmt);
-	tmpPh = ph_forward(tmpPh,timeStep);
-	[valid,tmpPh] = ph_verify(tmpPh);
-	if(valid)
-		ph = tmpPh;
-		bloatAmt = tmpBloatAmt;
-	else
-		break;
-	end;
+	if(1-r>opt.reps), break; end % stop if the gap is small
+	bloatAmt = min(ph.fwd.realBloatAmt,maxBloat);
+	ph = ph_model(ph,bloatAmt);
+	ph = ph_forward(ph,timeStep);
+	[valid,ph] = ph_verify(ph);
+  %% NOTE valid may fail because of over-approx in realBloatAmt; 
+%%	if(~valid)
+%%		%%log_write('WARN:: Verify failed during reducing model error.'); 
+%%	end
 end
 
 fwdPh = ph_construct(ph);
