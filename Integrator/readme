@@ -1,0 +1,6 @@
+This package is for the LDI (linear differential inclusion) models: 
+  xdot \in Ax + b +/- u;
+
+int_create   : create a LDI model
+int_forward  : forward a LP with a LDI model, based on max-flow theory
+int_range    : compute the lower/upper bound of a LDI model in a region. 

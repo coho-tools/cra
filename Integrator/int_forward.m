@@ -41,8 +41,9 @@ function fwdLP = int_forward(lp,ldi,t,method)
 			s = sign(expm(-A'*t/2)*P')'; 
 			ints = (P*mc.*s*u); 
 			ints = ints+10*eps; % for round-off error
-			%NOTE, ints should always be positive. However, this method may
-			% give negative results. see test/bug1
+			% NOTE, ints should always be positive. 
+			% However, this method may give negative results. see test/bug1
+			% The bug has been fixed.
 			assert(all(ints>=0)); 
 		case {'num','sample'} % sample N time points 
 			N = 20; ts = linspace(0,t,N+1); 
