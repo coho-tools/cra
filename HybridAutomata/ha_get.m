@@ -10,16 +10,16 @@ switch(lower(field))
 	case 'states'
 		val = ha.states;
 	case 'trans' % restore transition array 
-		edges = ha.edges; nt = size(edges,1); transActs = ha.transActs; 
-		HEAD=1; GATE=2; TAIL=3; 
+		edges = ha.edges; nt = size(edges,1); resetMaps = ha.resetMaps; 
+		SRC=1; GATE=2; TGT=3; 
 		trans = repmat(ha_trans('nouse',1,'nouse'),nt,1);
 		for i=1:nt
-			if(edges(i,TAIL)==0)
+			if(edges(i,TGT)==0)
 				to = 'nowhere';
 			else
-				to = snames{edges(i,TAIL)};
+				to = snames{edges(i,TGT)};
 			end
-			trans(i) = ha_trans(snames{edges(i,HEAD)},edges(i,GATE),to,transActs{i});
+			trans(i) = ha_trans(snames{edges(i,SRC)},edges(i,GATE),to,resetMaps{i});
 		end
 		val = trans;
 	case 'sources'

@@ -21,11 +21,9 @@ end
 states = ha_get(ha,'states'); trans = ha_get(ha,'trans');
 sources = ha_get(ha,'sources'); initials = ha_get(ha,'initials');
 
-% NOTE, the following operations depends on the structure of state (see ha_state)
+%% Update states
+% NOTE, the following operations depends on the structure of state (ha_state)
 % Remember to update the code if ha_state is modified.
-% (I hate this, but I think the structure of state will rarely be modified)
-
-% Update states
 % 1. find the states
 osind = utils_strs2ids(stateName,ha.snames);
 % 2. delete the old state
@@ -41,12 +39,12 @@ for ind=1:prod(siz)
 	[sinds{:}] = ind2sub(siz,ind);
 	state = ostate;
 
-	% update 'name','inv','doSlice','exitFunc' fields
+	% update 'name','inv','sliceCond','exitCond' fields
 	name = state.name; sinv = state.inv; 
-	doSlice = state.doSlice; exitFunc = state.exitFunc;
+	exitCond = state.callBacks.exitCond; sliceCond = state.callBacks.sliceCond; 
 	[ng,dim] = size(sinv.A);
-	if(~iscell(doSlice)) % convert to cell
-		doSlice = repmat({doSlice},ng,1);
+	if(~iscell(sliceCond)) % convert to cell
+		sliceCond = repmat({sliceCond},ng,1);
 	end
 	for d=1:nd % for each variable (dimension)
 		dind = sinds{d}; % the index of this dimension 
@@ -62,21 +60,21 @@ for ind=1:prod(siz)
 		lp = lp_create(A,b);
 		sinv = lp_and(sinv,lp); % two new gates, may produce duplicated gate on the boudary.
 	end 
-	% doSlice 
-	func = ha_funcTemp('doSlice','transit'); % The variable varies monotonically 
-	doSlice = [doSlice;repmat({func},2*nd,1)];
-	% exitFunc
+	% exitCond
 	if(ind~=prod(siz))  % the last state may be stable state
-		exitFunc = ha_funcTemp('exitFunc','transit'); % override the exitFunc
+		exitCond = ha_callBacks('exitCond','transit'); % override the exitCond
 	end
+	% sliceCond 
+	func = ha_callBacks('sliceCond','transit'); % The variable varies monotonically 
+	sliceCond = [sliceCond;repmat({func},2*nd,1)];
 	state.name = name;
 	state.inv = sinv;
-	state.doSlice = doSlice; state.exitFunc = exitFunc;
+	state.callBacks.exitCond = exitCond; state.callBacks.sliceCond = sliceCond; 
 	state.ng= state.ng+2*nd; state.slices = cell(state.ng,1); % new gates
 	nstates(sinds{:}) = state;
 end
 
-% Update transistions
+%% Update transistions
 % 1. create transistions between states and sub-states
 ntrans = repmat(trans,0,1);
 for i=1:length(trans)

@@ -1,6 +1,6 @@
 function ha = ha_op(ha,op,varargin)
 snames = ha.snames;
-HEAD=1; GATE=2; TAIL=3;
+SRC=1; GATE=2; TGT=3;
 switch(lower(op))
 	case {'remove','trim'} % remove states and its outgoing transitions
 		% find state ID 
@@ -22,8 +22,8 @@ switch(lower(op))
 		ha.states(rsids) = [];
 	
 		% remove all outgoing transistions from these states
-		inds = utils_graphEdge(ha.edges(:,[HEAD,TAIL]),rsids,'outgoing');
-		ha.edges(inds) = []; ha.transActs(inds) = [];
+		inds = utils_graphEdge(ha.edges(:,[SRC,TGT]),rsids,'outgoing');
+		ha.edges(inds) = []; ha.resetMaps(inds) = [];
 
 		% update sources
 		sources = newInd(ha.sources); inds = isnan(sources);
@@ -65,22 +65,22 @@ switch(lower(op))
 		fprintf('Hybrid automaton %s has transistisons:\n',ha.name);
 		edges = ha.edges; nt = size(edges,1);
 		for i=1:nt
-			if(edges(i,TAIL)==0)
+			if(edges(i,TGT)==0)
 				to = 'nil';
 			else
-				to = snames{edges(i,TAIL)};
+				to = snames{edges(i,TGT)};
 			end
-			fprintf('%s:%d\t->\t%s\n',snames{edges(i,HEAD)},edges(i,GATE),to);
+			fprintf('%s:%d\t->\t%s\n',snames{edges(i,SRC)},edges(i,GATE),to);
 		end
 	case 'disptrans' % display the transistion only
 		edges = ha.edges; nt = size(edges,1);
 		for i=1:nt
-			if(edges(i,TAIL)==0)
+			if(edges(i,TGT)==0)
 				to = 'nil';
 			else
-				to = snames{edges(i,TAIL)};
+				to = snames{edges(i,TGT)};
 			end
-			fprintf('%s:%d\t->\t%s\n',snames{edges(i,HEAD)},edges(i,GATE),to);
+			fprintf('%s:%d\t->\t%s\n',snames{edges(i,SRC)},edges(i,GATE),to);
 		end
 	otherwise
 		error('not implemented');

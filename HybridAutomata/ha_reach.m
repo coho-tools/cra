@@ -1,34 +1,31 @@
 function ha  = ha_reach(ha)
-% This function solves reachability problems for all states of a hybrid automata. 
+% This function computes reachable regions for all states of a hybrid automata. 
+SRC=1; GATE=2; TGT=3; 
 
-% NOTE: Ususally, there are more than one states available, 
-% thus, we can speed up the computation by parrallel computation. 
-
-% get information
-name  = ha.name; 
-edges = ha.edges; 
-HEAD=1; GATE=2; TAIL=3; 
+% Get information
+name  = ha.name; edges = ha.edges; 
 sources = ha.sources; initials = ha.initials;
 inv = ha.inv; rpath = ha.rpath; 
 order = ha.order; start = ha.last+1;
 
-% create the directory
+% Create the directory
 utils_system('mkdir',rpath);
 
 try
 	log_write(sprintf('\nStart to compute reachable region for hybrid automata %s',name));
-	t = cputime;
+	haT = cputime;
+
+  % Compute reachable region for each state
 	for i=start:length(order)
-		sid = order(i);  state = ha.states(sid);
+		sid = order(i);  state = ha.states(sid); stateT = cputime;
 		log_write(sprintf('Computing reachable region of the %s state (%d/%d) ...',state.name,i,length(order)));
-		tt = cputime;
 	
-		% compute init region from all sources
+		% Compute init region from all sources states
 		if(any(sid==sources)) % user provides
 			init = initials{sid==sources};
 		else % union of slices
-			ind = edges(:,TAIL)==sid;	
-			hid = edges(ind,HEAD); gid = edges(ind,GATE); 
+			ind = edges(:,TGT)==sid;	
+			hid = edges(ind,SRC); gid = edges(ind,GATE); 
 			nh = length(hid); slices = cell(nh,1);
 			% NOTE, Large error from union op, trim by invarint 
 			sinv = lp_and(inv,state.inv);
@@ -46,23 +43,25 @@ try
 			init = ph_canon(ph_simplify(ph_union(slices)),sinv);
 		end
 		
-		% compute reachable region
+		% Compute reachable region
 		[phs,timeSteps,tubes,state] = ha_stateReach(state,init,inv);
 		ha.states(sid) = state; ha.last=i;
 	
-		% save reachable region 
-		log_write(sprintf('Writting reachable regions data to %s ...',ha_get(ha,'statefile',sid)));
-		save(ha_get(ha,'statefile',sid),'phs','timeSteps','tubes');
-		log_write(sprintf('Computation in the %s state is completed in %d mins',state.name,(cputime-tt)/60));
+		% Save state computation result 
+		sfile = ha_get(ha,'statefile',sid);
+		log_write(sprintf('WristateTing reachable regions data to %s ...',sfile)); 
+		save(sfile,'phs','timeSteps','tubes');
+
+		log_write(sprintf('Computation in the %s state is completed in %d mins',state.name,(cputime-stateT)/60));
 	end
+
+	% Save ha file at the end
 	log_write('Writing the final hybrid automata to disk ...');
 	save(ha_get(ha,'hafile'),'ha');
-	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins\n',name,(cputime-t)/60));
+
+	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins\n',name,(cputime-haT)/60));
 catch ME
-	% Make sure the hybrid automata file is saved
-	% Save a hybrid automata is time-consuming (I also hate it!).
-	% I do not want to save it after each state computation. 
-	% Therefore, I save it here if something bad happens.
+	% Save the automata, which is time-consuming (I hate it). 
 	log_write('Exceptions found. Remember to save the hybrid automata to disk!!!');
 	rethrow(ME); 
 end

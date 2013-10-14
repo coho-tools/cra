@@ -7,7 +7,7 @@ function state = ha_stableState(name,modelFunc,inv,phOpt,tbnd)
 % Parameters:
 %   tbnd:  [minT,maxT]: can't be empty
 if(nargin<5), error('not enough parameters'); end
-if(isempty(tbnd)||length(tbnd)!=2), error('tbnd must be [minT,maxT]'); end;
+if(isempty(tbnd)||length(tbnd)~=2), error('tbnd must be [minT,maxT]'); end;
 
 callBacks.exitCond = ha_callBacks('exitCond','stable',tbnd(1),tbnd(2));
 callBacks.sliceCond = ha_callBacks('sliceCond','stable',tbnd(1));

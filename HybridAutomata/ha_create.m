@@ -1,4 +1,14 @@
 function ha = ha_create(name,states,trans,sources,initials,inv,rpath)
+% ha = ha_create(name,states,trans,sources,initials,inv,rpath)
+%   The function create a hybrid automata
+%   Parameters
+%     name:   Name of the hybrid automata. 
+%     states: Automata states, see ha_states for details.
+%     trans:  Transitions between states, see ha_trans for details 
+%     sources: Source states 
+%     initials: Initial regions for each source state. (cell) 
+%     inv:    Global invariant of reachable regions
+%     rpath:  Path to save reachable regions.
 if(nargin<1), name = []; end 
 if(nargin<2), states = []; end
 if(nargin<3), trans = []; end
@@ -53,7 +63,7 @@ else
 	nc = length(sources);
 end
 % allow one source and initial region is empty
-if(nc==1&&isempty(initials))
+if(nc==1&&isempty(initials)) % why, to create empty ha?
 	initials = cell(1,1);
 end
 ni = length(initials);
@@ -86,13 +96,13 @@ ngs = reshape([states.ng],ns,1);
 if(any(gates<0) || any(gates>ngs(hids))) % NOTE: support gate = 0
 	error('gate is out of range');
 end
-HEAD = 1; GATE=2; TAIL = 3; 
-edges(:,[HEAD,GATE,TAIL]) = [hids,gates,tids]; 
+SRC = 1; GATE=2; TGT = 3; 
+edges(:,[SRC,GATE,TGT]) = [hids,gates,tids]; 
 resetMaps = {trans.resetMap};  
 
 % We compute slices only necessary 
 for i=1:ns
-	tid = (edges(:,HEAD)==i); % source from this state
+	tid = (edges(:,SRC)==i); % source from this state
 	gs = unique(edges(tid,GATE)); % gate of this transistion
 	states(i).sgates  = gs; % update states
 end
@@ -101,16 +111,16 @@ end
 % Compute the reachability computation order 
 % 1. break incoming edge of sources
 tedges = edges;
-cinds = utils_graphEdge(tedges(:,[HEAD,TAIL]),sources,'incoming');
+cinds = utils_graphEdge(tedges(:,[SRC,TGT]),sources,'incoming');
 tedges(cinds,:) = [];
 
 % 2. remove dangling states except sources
 while(true) % remove edges from dangling nodes recursively
 	% find zero in-degree nodes
-	nzs = tedges(:,TAIL); nzs(nzs==0) = []; % do not consider 'nowhere' state
+	nzs = tedges(:,TGT); nzs(nzs==0) = []; % do not consider 'nowhere' state
 	isd = true(ns,1); isd([nzs;sources]) = false; dsids = find(isd);
 	% remove edges from dangling states
-	inds = utils_graphEdge(tedges(:,[HEAD,TAIL]),dsids,'outgoing');
+	inds = utils_graphEdge(tedges(:,[SRC,TGT]),dsids,'outgoing');
 	tedges(inds,:) = [];
 	if(isempty(inds))
 		break;
@@ -127,10 +137,10 @@ end
 % 3. compute computation flow from sources until no new reachable state
 order = sources; news = sources;
 while(true) % remove edges from sources recursively
-	inds = utils_graphEdge(tedges(:,[HEAD,TAIL]),news,'outgoing');
+	inds = utils_graphEdge(tedges(:,[SRC,TGT]),news,'outgoing');
 	tedges(inds,:) = [];
 	% find zero in-degree nodes
-	nzs  = tedges(:,TAIL); nzs(nzs==0) = []; 
+	nzs  = tedges(:,TGT); nzs(nzs==0) = []; 
 	isn = true(ns,1); isn([nzs;order;dsids]) = false;
 	news = find(isn); order = [order;news];
 	if(isempty(news))

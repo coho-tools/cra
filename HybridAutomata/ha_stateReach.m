@@ -29,12 +29,13 @@ cra_cfg('set','modelFunc',modelFunc);
 binv = lp_bloat(inv,tol); % bloat outward for slicing
 fwdOpt.constraintLP = lp_and(fwdOpt.constraintLP,lp_and(ginv,binv)); 
 % compute LP for slicing
-faceLPs = cell(ng,1);
+faceLPs = cell(ng+1,1); % for virtual gate 0
 for i=1:ng
 	gate = sgates(i);
 	lp = lp_create(-inv.A(gate,:),-inv.b(gate));
 	faceLPs{i} = lp_bloat(lp,tol); % bloat inward
 end
+faceLPs{ng+1} = []; % do not intersect, use the tube. 
 
 % Compute initial region 
 initPh = init;
@@ -105,12 +106,8 @@ while(~complete)
 	if(length(ds)==1), ds = repmat(ds,ng+1,1); end;
 	for i = 1:ng+1
 	  if(ds(i))
-			if(i==ng+1) % reachable tube, no slice
-				faces{i}{end+1} = tube;
-			else % slice with faces
-		    face = ph_intersectLP(tube,faceLPs{i}); 
-		    faces{i}{end+1} = ph_simplify(face);  % canonical 
-			end
+		  face = ph_intersectLP(tube,faceLPs{i}); 
+		  faces{i}{end+1} = ph_simplify(face);  % canonical 
 	  end
   end
 

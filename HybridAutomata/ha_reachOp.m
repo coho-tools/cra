@@ -1,7 +1,7 @@
 function val = ha_reachOp(ha,func,range)
 % This function apply a function to every ph in a state of ha
-% 	func(phs,timeStep);
-% 	val = func(phs,timeStep,val);
+% 	func(phs,timeStep,tubes);
+% 	val = func(phs,timeStep,tubes); 
 if(nargin<3||isempty(range))
 	range = [1,ha.last];
 end
@@ -16,9 +16,8 @@ for i=range(1):range(2)
 	end
 	data = load(file);
 	if(nargout==0)
-		func(data.phs,data.timeSteps);
+		func(data.phs,data.timeSteps,data.tubes);
 	else
-		%val = func(data.phs,data.timeSteps,val);
-		val = func(data.phs,data.timeSteps);
+		val = func(data.phs,data.timeSteps,data.tubes);
 	end
 end
