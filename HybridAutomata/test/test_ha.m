@@ -1,6 +1,6 @@
 function test_ha
 	test_ex1;
-	test_ex2;
+%	test_ex2;
 
 function test_ex2
 	% test empty hybrid automaton
@@ -111,42 +111,68 @@ function test_ex1
 	opt = ph_getOpt;
 	opt.object = 'ph';
 	opt.model = 'bloatAmt';
-	stepAct = @(ph,prevPh)(ph_display(ph));
+	phOpt.fwdOpt = opt;
+
 	% state 1
+	% leave the region eventually as xdot > 0
 	name1 = 'state1';
 	modelFunc = @(lp)ex1_model(lp,1);
 	inv = lp_createByBox([0.5,1;0.0,0.1]);
-	phinfo.type = 1;
-	states(1) = ha_transState(name1,modelFunc,inv,phinfo,opt,[],stepAct);
+	phOpt.type = 1;       % convex, default planes 
+  callBacks.exitCond   = ha_callBacks('exitCond','transit');  % exit when empty
+  callBacks.sliceCond  = ha_callBacks('sliceCond','transit');% always slice
+	callBacks.beforeStep = @(info)ex1_step_callback(info,1,0); 
+	callBacks.afterStep  = @(info)ex1_step_callback(info,1,1); 
+	states(1) = ha_state(name1,modelFunc,inv,phOpt,callBacks);
+
 	% state 2
+	% stuck in the region as 0 is in the initial region
 	name2='state2';
 	modelFunc = @(lp)ex1_model(lp,2);
 	inv = lp_createByBox([0.9,1;0,1]);
-	phinfo.type = 2;
-	phinfo.planes = [2,1];
-	states(2) = ha_fastStableState(name2,modelFunc,inv,phinfo,opt,[],stepAct);
+	phOpt.type = 2;       % bbox
+	phOpt.planes = [2,1]; % change planes
+  callBacks.exitCond   = ha_callBacks('exitCond','stable'); % exit when converge
+  callBacks.sliceCond  = ha_callBacks('sliceCond','stable');
+	callBacks.beforeStep = @(info)ex1_step_callback(info,2,0); 
+	callBacks.afterStep  = @(info)ex1_step_callback(info,2,1); 
+	states(2) = ha_state(name2,modelFunc,inv,phOpt,callBacks);
+
 	% transition
 	trans(1) = ha_trans(name1,1,name2);
 	trans(2) = ha_trans(name1,2,name2);
 	trans(3) = ha_trans(name1,3,name2);
 	trans(4) = ha_trans(name1,4,name2);
+	trans(5) = ha_trans(name1,0,name2); % test gate 0
+
 	% automata 
 	name = 'ex1';
 	inv = lp_createByBox([0.5,1;0.0,1]);
 	rpath='.';
 	ha = ha_create(name,states,trans,name1,ph,inv,rpath);
+
 	% computation
 	ha_reach(ha);
 	ha_reachOp(ha,@(phs,ts)phs_display(phs));
 
 function ldi = ex1_model(lp,state) 
 	switch(state)
-		case 1
+		case 1  % increase x
 			A = [1,0;0,0]; b = [0;0];
-		case 2
+		case 2  % increase y
 			A = [0,0;0,1]; b = [0;0];
 		otherwise
 			error('do not support');
 	end
 	u = [0;0];
 	ldi{1} = int_create(A,b,u);
+
+function ph = ex1_step_callback(info,state,boa)
+	fig = state;
+	ph = info.ph;
+	if(boa==0) % before
+		ph_display(ph,fig,[],[],'b');
+	else % after
+		ph_display(ph,fig,[],[],'r');
+		pause(1);
+	end

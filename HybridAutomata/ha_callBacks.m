@@ -6,7 +6,7 @@ function func = ha_callBacks(callback, method, varargin)
 %        'default', 'transit'/'phEmpty','phConverge','maxFwdStep','maxFwdT',
 %        'maxCompT','target','stable'
 % 	  'sliceCond':  method could be:
-%        'default'/'transit'/'always', 'minFwdT', 'stable'/'minTorExit'
+%        'default'/'transit'/'always', 'minFwdT', 'stable'/'complete'
 % 	  'beforeComp': method could be: 
 %        'default'/'nil','display'
 % 	  'afterComp':  method could be: 
@@ -77,10 +77,9 @@ function done = ha_exitCond(info,method,varargin)
 			done = ph_contain(tph,info.ph);
 
 		case 'stable'                         % Stop when converge or max time
-			if(~isempty(varargin)), maxFwdT = varargin{1}; end
-			if(length(varargin)>1), minFwdT = varargin{2}; end
-			if(isempty(maxFwdT)), maxFwdT = Inf; end
-			if(isempty(minFwdT)), minFwdT = 0; end
+			minFwdT = 0; maxFwdT = Inf;
+			if(~isempty(varargin) && ~isempty(varargin{1})), maxFwdT = varargin{1}; end
+			if(length(varargin)>1 && ~isempty(varargin{2})), minFwdT = varargin{2}; end
 			done = (info.fwdT>=maxFwdT) || ...
 				     (info.fwdT>=minFwdT && ph_contain(info.prevPh,info.ph)); 
 			
@@ -100,11 +99,8 @@ function dos = ha_sliceCond(info,method,varargin)
 			end
 			minT = varargin{1};
 			dos = (info.fwdT>=minT);
-		case 'complete'                       % Slice when leave the state
-			dos = complete;
-		case {'stable','mintorexit'}          % Slice after some time or before exit
-			minT = varargin{1};
-			dos = (info.complete | (info.fwdT>=minT));
+		case {'complete','stable'}            % Slice when leave the state
+			dos = info.complete;
 		otherwise
 			error('do not support');
 	end 

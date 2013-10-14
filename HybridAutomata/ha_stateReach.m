@@ -35,7 +35,7 @@ for i=1:nsg
 	if(gid==0) % for virtual gate 0, no lp to intersect
 		faceLPs{i} = [];
 	else
-	  lp = lp_create(-inv.A(gate,:),-inv.b(gate));
+	  lp = lp_create(-inv.A(gid,:),-inv.b(gid));
 	  faceLPs{i} = lp_bloat(lp,tol); % bloat inward
 	end
 end
@@ -63,18 +63,18 @@ if(~isempty(beforeComp))
 end
 
 % Perform reachability computation
-N = 1000; phs = cell(N,1); tubes = cell{N,1}; 
+N = 1000; phs = cell(N,1); tubes = cell(N,1);
 timeSteps=zeros(N,1); faces = cell(nsg,1);  
-fwdT = 0; startT = cputime; saveT = cputime;
-complete= false; fwdStep = 0; ph = initPh; 
+startT = cputime; saveT = cputime; fwdT = 0; compT = 0;
+ph = initPh; prevPh = []; complete= false; fwdStep = 0; 
 while(~complete)
 	fwdStep = fwdStep+1;
 	log_write(sprintf('Computing forward reachable region of fwdStep %d from time %d',fwdStep,fwdT));
 
 	% Compute forward reachable sets and tubes 
 	if(~isempty(beforeStep)) % Callback before each fwdStep
-		info = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
-	  ph = beforeStep(info); 
+		cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
+	  ph = beforeStep(cbInfo); 
 	end
 	if(ph_isempty(ph)) 
 		error('Exception in state %s, projectagon to be advanced is empty.',name); 
@@ -95,7 +95,7 @@ while(~complete)
 	phs{fwdStep} = ph; tubes{fwdStep} = tubes; 
 	timeSteps(fwdStep)=prevPh.fwd.timeStep; fwdT=fwdT+prevPh.fwd.timeStep; 
 	compT = cputime-startT;
-	cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdStep',fwdStep,'compT',compT);
+	cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
 	if(~isempty(afterStep)) % Callback after each fwdStep 
 	  ph = afterStep(cbInfo); 
 	end
