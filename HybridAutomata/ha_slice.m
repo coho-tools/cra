@@ -43,9 +43,9 @@ for ind=1:prod(siz)
 	name = state.name; sinv = state.inv; 
 	exitCond = state.callBacks.exitCond; sliceCond = state.callBacks.sliceCond; 
 	[ng,dim] = size(sinv.A);
-	if(~iscell(sliceCond)) % convert to cell
-		sliceCond = repmat({sliceCond},ng,1);
-	end
+	%if(~iscell(sliceCond)) % convert to cell
+	%	sliceCond = repmat({sliceCond},ng+1,1); % gate0
+	%end
 	for d=1:nd % for each variable (dimension)
 		dind = sinds{d}; % the index of this dimension 
 		% name 
@@ -64,13 +64,18 @@ for ind=1:prod(siz)
 	if(ind~=prod(siz))  % the last state may be stable state
 		exitCond = ha_callBacks('exitCond','transit'); % override the exitCond
 	end
+	% TODO: don't support cell sliceCond function
 	% sliceCond 
 	func = ha_callBacks('sliceCond','transit'); % The variable varies monotonically 
-	sliceCond = [sliceCond;repmat({func},2*nd,1)];
+	% sliceCond = [sliceCond;repmat({func},2*nd,1)];
+	sliceCond = @(info,method,varagin)ha_slice_help( ...
+	              sliceCond,repmat({func},2*nd,1),ng+1, ...
+								info,method,varagin{:});
+	
 	state.name = name;
 	state.inv = sinv;
 	state.callBacks.exitCond = exitCond; state.callBacks.sliceCond = sliceCond; 
-	state.ng= state.ng+2*nd; state.slices = cell(state.ng,1); % new gates
+	state.ng= state.ng+2*nd; state.slices = cell(state.ng+1,1); % new gates+gate0
 	nstates(sinds{:}) = state;
 end
 
@@ -130,3 +135,17 @@ end
 % We assume the state is not the source
 states = [states(:);nstates(:)]; trans = [trans(:);ntrans(:)];
 ha = ha_create(ha.name,states,trans,sources,initials,ha.inv,ha.rpath);
+end % function
+
+
+function dos = ha_slice_help(oldFunc, newFunc, old_ng, info, method, varargin)
+	old_dos = oldFunc(info,method,varargin{:});
+	if(length(old_dos)==1)
+		old_dos = repmat(old_dos,old_ng+1,1);
+	end
+	new_dos = zeros(length(newFunc),1);
+	for i=1:length(newFunc)
+	  new_dos(i,1) = newFunc{i}(info,method,varargin{:});
+	end
+	dos = [old_dos(1:old_ng);new_dos;old_dos(end)]; % move gate 0 to the end
+end % function

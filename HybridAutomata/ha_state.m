@@ -27,8 +27,6 @@ function state = ha_state(name,modelFunc,inv,phOpt,callBacks)
 %            complete: the reachable computation is complete 
 %            ph, prevPh, fwdStep, fwdT, compT 
 %        sliceCond could be a scalar or vector to have varied conds for faces 
-%        NOTE: when a vector is returned, the size must ng+1x1, where ng is the 
-%              number of 'gates'. The last one is for virtual gate 0. 
 %      beforeComp: ~ = beforeComp(info);
 %        called before the reachability computation
 %          info has the following fields: 

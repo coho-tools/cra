@@ -5,7 +5,7 @@ function [phs,timeSteps,tubes,state] = ha_stateReach(state,init,ginv)
 name = state.name; modelFunc = state.modelFunc; 
 inv = state.inv; phOpt = state.phOpt; 
 % gates
-sgates = state.sgates; ng = length(sgates);
+sgates = state.sgates; ng = state.ng; nsg = length(sgates);
 % non-empty callbacks 
 exitCond = state.callBacks.exitCond; sliceCond = state.callBacks.sliceCond;
 % maybe empty callbacks
@@ -29,13 +29,16 @@ cra_cfg('set','modelFunc',modelFunc);
 binv = lp_bloat(inv,tol); % bloat outward for slicing
 fwdOpt.constraintLP = lp_and(fwdOpt.constraintLP,lp_and(ginv,binv)); 
 % compute LP for slicing
-faceLPs = cell(ng+1,1); % for virtual gate 0
-for i=1:ng
-	gate = sgates(i);
-	lp = lp_create(-inv.A(gate,:),-inv.b(gate));
-	faceLPs{i} = lp_bloat(lp,tol); % bloat inward
+faceLPs = cell(nsg,1); % for virtual gate 0
+for i=1:nsg
+	gid = sgates(i);
+	if(gid==0) % for virtual gate 0, no lp to intersect
+		faceLPs{i} = [];
+	else
+	  lp = lp_create(-inv.A(gate,:),-inv.b(gate));
+	  faceLPs{i} = lp_bloat(lp,tol); % bloat inward
+	end
 end
-faceLPs{ng+1} = []; % do not intersect, use the tube. 
 
 % Compute initial region 
 initPh = init;
@@ -61,7 +64,7 @@ end
 
 % Perform reachability computation
 N = 1000; phs = cell(N,1); tubes = cell{N,1}; 
-timeSteps=zeros(N,1); faces = cell(ng+1,1);  
+timeSteps=zeros(N,1); faces = cell(nsg,1);  
 fwdT = 0; startT = cputime; saveT = cputime;
 complete= false; fwdStep = 0; ph = initPh; 
 while(~complete)
@@ -104,8 +107,10 @@ while(~complete)
 	ds = sliceCond(cbInfo);
 	assert(numel(ds)==1 || numel(ds)==ng+1);
 	if(length(ds)==1), ds = repmat(ds,ng+1,1); end;
-	for i = 1:ng+1
-	  if(ds(i))
+	for i = 1:nsg
+		gid = sgates(i); 
+		if(gid==0), gid = ng+1; end;
+	  if(ds(gid))
 		  face = ph_intersectLP(tube,faceLPs{i}); 
 		  faces{i}{end+1} = ph_simplify(face);  % canonical 
 	  end
@@ -124,11 +129,13 @@ tubes = tubes(1:fwdStep);
 timeSteps = timeSteps(1:fwdStep);
 
 % save slices for initial region of other states
-for i=1:ng+1  % the end is for gate 0
+for i=1:nsg  % the end is for gate 0
 	slice = ph_canon(ph_simplify(ph_union(faces{i})));
-	state.slices{sgates(i)} = slice;
+	gid = sgates(i); 
+	if(gid==0), gid=ng+1; end;
+	state.slices{gid} = slice;
 	if(isempty(slice)) 
-		log_write(sprintf('The slice on gate %s:%d is empty',name,sgates(i)));
+		log_write(sprintf('The slice on gate %s:%d is empty',name,gid));
 	end
 end
 
