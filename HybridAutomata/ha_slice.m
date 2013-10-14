@@ -81,18 +81,18 @@ end
 ntrans = repmat(trans,0,1);
 for i=1:length(trans)
 	t = trans(i); 
-	if(strcmpi(t.head,stateName))
+	if(strcmpi(t.src,stateName))
 		% from all states
 		for j = 1:prod(siz)
-			t.head = nstates(j).name;
+			t.src = nstates(j).name;
 			ntrans(end+1,1) = t;
 		end
 	end
 	t = trans(i);
-	if(strcmpi(t.tail,stateName))
+	if(strcmpi(t.tgt,stateName))
 		% to all states
 		for j=1:prod(siz)
-			t.tail = nstates(j).name;
+			t.tgt = nstates(j).name;
 			ntrans(end+1,1) = t;
 		end
 	end
@@ -100,13 +100,13 @@ end
 % 2. create transitions between sub-states
 for ind =1:prod(siz)
 	[sinds{:}] = ind2sub(siz,ind);
-	head = nstates(sinds{:}).name;
+	src = nstates(sinds{:}).name;
 	for d=1:nd
 		if(sinds{d}<siz(d))
 			nind = sinds; nind{d} = nind{d}+1;
-			tail = nstates(nind{:}).name;
+			tgt = nstates(nind{:}).name;
 			gate = ostate.ng+2*d; % the d-th new 'to' gate
-			ntrans(end+1,1) = ha_trans(head,gate,tail);
+			ntrans(end+1,1) = ha_trans(src,gate,tgt);
 		end
 	end
 end
@@ -114,7 +114,7 @@ end
 inds = false(length(trans),1);
 for i=1:length(trans)
 	t = trans(i);
-	if(strcmpi(t.head,stateName) || strcmpi(t.tail,stateName))
+	if(strcmpi(t.src,stateName) || strcmpi(t.tgt,stateName))
 		inds(i) = true;
 	end
 end

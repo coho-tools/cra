@@ -38,7 +38,7 @@ if(isempty(trans))
 	trans = repmat(ha_trans('nowhere',1,'nowhere'),0,1);
 end
 if(isempty(rpath))
-	rpath = './';
+	rpath = '.';
 end
 if(~isempty(initials)&&~iscell(initials))
 	initials = {initials}; % make the following codes simplier
@@ -75,20 +75,20 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % process transistion
-heads = {trans.head}; tails = {trans.tail}; 
-hids = utils_strs2ids(heads,snames);
-tids = utils_strs2ids(tails,snames); % allow edges to 'nowhere'
+srcs = {trans.src}; tgts = {trans.tgt}; 
+hids = utils_strs2ids(srcs,snames);
+tids = utils_strs2ids(tgts,snames); % allow edges to 'nowhere'
 if(any(hids==0))  
-	error('head state not found');
+	error('src state not found');
 end
 gates = reshape([trans.gate],nt,1);
 ngs = reshape([states.ng],ns,1);
-if(any(gates<1) || any(gates>ngs(hids)))
+if(any(gates<0) || any(gates>ngs(hids))) % NOTE: support gate = 0
 	error('gate is out of range');
 end
 HEAD = 1; GATE=2; TAIL = 3; 
 edges(:,[HEAD,GATE,TAIL]) = [hids,gates,tids]; 
-transActs = {trans.transAct}; % record transActs
+resetMaps = {trans.resetMap};  
 
 % We compute slices only necessary 
 for i=1:ns
@@ -145,7 +145,7 @@ last = 0; % no state has been computed
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % create the structure
 ha = struct('name',name, 'states',states, 'snames',{snames}, ... % states
-		'edges',edges,  'transActs',{transActs}, ... % transitions
+		'edges',edges,  'resetMaps',{resetMaps}, ... % transitions
 		'sources',sources, 'initials',{initials}, ... % sources
 		'inv',inv, 'rpath',rpath, 'order',order, 'last',last); % other info
 

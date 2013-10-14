@@ -60,14 +60,14 @@ echo "
 %     info = cra_info;  // return the structure
 %     has_cplex = cra_info('has_cplex'); // has the value
 function val = cra_info(field)
-  % NOTE: I use global vars because of the Matlab 2013 bug. 
-	%       (Persistent vars re-inited upon the first path changes)
+  % NOTE: I use global vars because of the Matlab bug. 
+	%       (When the code is in linked dir, persistent vars are re-inited 
+	%        when firstly changing to a new directory). 
   %       Please don't modify the value by other functions. 
   %persistent  CRA_INFO;
   global CRA_INFO;
   if(isempty(CRA_INFO)) 
     CRA_INFO = cra_info_init; % evaluate once
-    disp('init info')
   end
   if(nargin<1||isempty(field))
     val = CRA_INFO;

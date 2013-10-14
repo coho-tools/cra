@@ -1,15 +1,13 @@
-function state = ha_transState(name,modelFunc,inv,phinfo,fwdOpt,entryAct,stepAct,exitAct)
-% This function creates a state where the trajectory will eventually leave this region. 
-% It has the similar interface with ha_state, but here we provide some default value for 
-% exitFunc and doSlice functions
+function state = ha_transState(name,modelFunc,inv,phOpt)
+% It creates a state where the trajectory will eventually leave the state inv. 
+% It has the similar interface with ha_state,  except providing callbacks: 
+%   exitCond: when the forward reachable region is empty 
+%   sliceCond: alway slice the forward regions with gates 
+%   others:   nil
 if(nargin<2), error('not enough parameters'); end
 if(nargin<3), inv = []; end
-if(nargin<4), phinfo = []; end
-if(nargin<5), fwdOpt = []; end
-if(nargin<6), entryAct = []; end
-if(nargin<7), stepAct = []; end
-if(nargin<8), exitAct = []; end
+if(nargin<4), phOpt = []; end
 
-exitFunc = ha_funcTemp('exitFunc','transit');
-doSlice = ha_funcTemp('doSlice','transit');
-state = ha_state(name,modelFunc,inv,phinfo,fwdOpt,exitFunc,doSlice,entryAct,stepAct,exitAct);
+callBacks.exitCond = ha_callBacks('exitCond','transit');
+callBacks.sliceCond = ha_callBacks('sliceCond','transit');
+state = ha_state(name,modelFunc,inv,phOpt,callBacks); 

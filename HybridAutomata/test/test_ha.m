@@ -1,14 +1,7 @@
 function test_ha
-	dbstop if error;
-	warning off all;
-	addpath('../../');
-	coho_addpath('HybridAutomata');
-	java_open;
-	log_open;
-%	test_ex1;
+	test_ex1;
 	test_ex2;
-	log_close;
-	java_close;
+
 function test_ex2
 	% test empty hybrid automaton
 	ha = ha_create();
@@ -140,7 +133,7 @@ function test_ex1
 	% automata 
 	name = 'ex1';
 	inv = lp_createByBox([0.5,1;0.0,1]);
-	rpath='./';
+	rpath='.';
 	ha = ha_create(name,states,trans,name1,ph,inv,rpath);
 	% computation
 	ha_reach(ha);

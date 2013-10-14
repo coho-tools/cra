@@ -1,16 +1,14 @@
-function state = ha_stableState(name,modelFunc,inv,phinfo,fwdOpt,entryAct,stepAct,exitAct,tbnd)
-if(nargin<2), error('not enough parameters'); end
-if(nargin<3), inv = []; end
-if(nargin<4), phinfo = []; end
-if(nargin<5), fwdOpt = []; end
-if(nargin<6), entryAct = []; end
-if(nargin<7), stepAct = []; end
-if(nargin<8), exitAct = []; end
-if(nargin<9), tbnd = []; end
-if(isempty(tbnd)), tbnd = [0,Inf]; end
-if(length(tbnd)<2), tbnd = [tbnd,Inf]; end
+function state = ha_stableState(name,modelFunc,inv,phOpt,tbnd)
+% It creates a state where the trajectory will stable in a region.  
+% It has the similar interface with ha_state,  except providing callbacks: 
+%   exitCond:  reachble state converges when minT satisfied OR maxT is reached
+%   sliceCond: slice when minT satisfied or complete 
+%   others:   nil
+% Parameters:
+%   tbnd:  [minT,maxT]: can't be empty
+if(nargin<5), error('not enough parameters'); end
+if(isempty(tbnd)||length(tbnd)!=2), error('tbnd must be [minT,maxT]'); end;
 
-
-exitFunc = ha_funcTemp('exitFunc','stable',tbnd(1),tbnd(2));
-doSlice = ha_funcTemp('doSlice','stable',tbnd(1));
-state = ha_state(name,modelFunc,inv,phinfo,fwdOpt,exitFunc,doSlice,entryAct,stepAct,exitAct);
+callBacks.exitCond = ha_callBacks('exitCond','stable',tbnd(1),tbnd(2));
+callBacks.sliceCond = ha_callBacks('sliceCond','stable',tbnd(1));
+state = ha_state(name,modelFunc,inv,phinfo,phOpt,callBacks); 
