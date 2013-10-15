@@ -45,7 +45,7 @@ if(isempty(states))
 	states = repmat(ha_state('nouse',@nofunc),0,1);
 end
 if(isempty(trans))
-	trans = repmat(ha_trans('nowhere',1,'nowhere'),0,1);
+	trans = repmat(ha_trans('nowhere','nowhere'),0,1);
 end
 if(isempty(rpath))
 	rpath = '.';

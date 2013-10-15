@@ -12,14 +12,14 @@ switch(lower(field))
 	case 'trans' % restore transition array 
 		edges = ha.edges; nt = size(edges,1); resetMaps = ha.resetMaps; 
 		SRC=1; GATE=2; TGT=3; 
-		trans = repmat(ha_trans('nouse',1,'nouse'),nt,1);
+		trans = repmat(ha_trans('nouse','nouse'),nt,1);
 		for i=1:nt
 			if(edges(i,TGT)==0)
 				to = 'nowhere';
 			else
 				to = snames{edges(i,TGT)};
 			end
-			trans(i) = ha_trans(snames{edges(i,SRC)},edges(i,GATE),to,resetMaps{i});
+			trans(i) = ha_trans(snames{edges(i,SRC)},to,edges(i,GATE),resetMaps{i});
 		end
 		val = trans;
 	case 'sources'

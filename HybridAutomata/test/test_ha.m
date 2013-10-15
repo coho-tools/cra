@@ -40,10 +40,10 @@ function test_ex2
 
 	
 	% test trans 
-	trans(1) = ha_trans('head',1,'tail');
-	trans(end+1) = ha_trans('head',1,'tail',@nofunc);
-	trans(end+1) = ha_trans('head',0,'tail'); 
-	%trans(end+1) = ha_trans('head',-1,'tail');
+	trans(1) = ha_trans('head','tail',1);
+	trans(end+1) = ha_trans('head','tail',1,@nofunc);
+	trans(end+1) = ha_trans('head','tail',0); 
+	%trans(end+1) = ha_trans('head','tail',-1);
 	%ha = ha_create('bad',states,trans);
 	
 	% test ha_create
@@ -61,13 +61,13 @@ function test_ex2
 	states(4) = ha_transState('s4',@sin,inv);
 	states(5) = ha_transState('s5',@sin,inv);
 	states(6) = ha_transState('s6',@sin,inv);
-	trans(1) = ha_trans('s1',1,'s2');
-	trans(2) = ha_trans('s2',1,'s3');
-	trans(3) = ha_trans('s3',1,'s4');
-	trans(4) = ha_trans('s4',1,'s5');
-	trans(5) = ha_trans('s5',1,'s6');
-	trans(6) = ha_trans('s6',1,'s7');
-	%trans(7) = ha_trans('s5',1,'s4');
+	trans(1) = ha_trans('s1','s2',1);
+	trans(2) = ha_trans('s2','s3',1);
+	trans(3) = ha_trans('s3','s4',1);
+	trans(4) = ha_trans('s4','s5',1);
+	trans(5) = ha_trans('s5','s6',1);
+	trans(6) = ha_trans('s6','s7',1);
+	%trans(7) = ha_trans('s5','s4',1);
 	sources = 's1'; initials = [];
 	%ha = ha_create('loop',states,trans,sources,initials);
 	%ha = ha_reach(ha);
@@ -143,11 +143,11 @@ function test_ex1
 	states(2) = ha_state(name2,modelFunc,inv,phOpt,callBacks);
 
 	% transition
-	trans(1) = ha_trans(name1,1,name2);
-	trans(2) = ha_trans(name1,2,name2);
-	trans(3) = ha_trans(name1,3,name2);
-	trans(4) = ha_trans(name1,4,name2);
-	trans(5) = ha_trans(name1,0,name2); % test gate 0
+	trans(1) = ha_trans(name1,name2,1);
+	trans(2) = ha_trans(name1,name2,2);
+	trans(3) = ha_trans(name1,name2,3);
+	trans(4) = ha_trans(name1,name2,4);
+	trans(5) = ha_trans(name1,name2,0); % test gate 0
 
 	% automata 
 	name = 'ex1';

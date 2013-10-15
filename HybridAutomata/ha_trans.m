@@ -1,5 +1,5 @@
-function trans = ha_trans(src,gate,tgt,resetMap)
-% trans = ha_trans(src,gate,tgt,resetMap)
+function trans = ha_trans(src,tgt,gate,resetMap)
+% trans = ha_trans(src,tgt,gate,resetMap)
 % The function creats directed link between states. 
 %   The computation result from source states are used to computate initial 
 %   regions of target state.  
@@ -10,11 +10,14 @@ function trans = ha_trans(src,gate,tgt,resetMap)
 %              as the initial regions of the target state 
 %            when gate=i, the intersection of reachable regions and i^th gate 
 %              are used as the initial regions of the target state
+%            gate = 0 by default
 %   resetMap: User provided function to change the target initial regions. 
 %            It's of the form of
 %            initPh = resetMap(initPh);
+%            empty by default.
 
-if(nargin<3), error('not enough parameters'); end
+if(nargin<2), error('not enough parameters'); end
+if(nargin<3||isempty(gate)), gate = 0; end;
 if(nargin<4), resetMap = []; end
 
 if(isempty(src)||~ischar(src)), error('src must be a non-empty string'); end
@@ -26,10 +29,10 @@ if(~isempty(resetMap) && ~isa(resetMap,'function_handle'))
 	error('resetMap must be a function'); 
 end
 
-% gate is a positive integer
-gate = uint32(gate);
 % src and tgt are case insensitive
 src = lower(src); 
 tgt = lower(tgt);
+% convert negative to 0
+gate = uint32(gate);  
 
-trans = struct('src',src,'gate',gate,'tgt',tgt,'resetMap',resetMap);
+trans = struct('src',src,'tgt',tgt,'gate',gate,'resetMap',resetMap);
