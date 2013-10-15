@@ -33,11 +33,7 @@ function state = ha_state(name,modelFunc,inv,phOpt,callBacks)
 %            initPh: initial projectagons 
 %      afterComp:  ~ = afterComp(info); 
 %        called at the end of reachability computation
-%          info has the following fields: 
-%            phs: all projectagons
-%            timeSteps: all forward time steps
-%            tubes: all projectagon tubes
-%            faces: intersection of projectagon and invaraint constraints
+%          info has the fields (see reachData in ha_stateReach). 
 %      beforeStep:  ph = beforeStep(info); 
 %        called before each computation step 
 %          info has the following fields: 

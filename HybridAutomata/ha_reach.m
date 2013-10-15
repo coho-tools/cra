@@ -49,13 +49,13 @@ try
 		end
 		
 		% Compute reachable region
-		[phs,timeSteps,tubes,state] = ha_stateReach(state,init,inv);
+		[state,reachData] = ha_stateReach(state,init,inv);
 		ha.states(sid) = state; ha.last=i;
 	
 		% Save state computation result 
 		sfile = ha_get(ha,'statefile',sid);
 		log_write(sprintf('WristateTing reachable regions data to %s ...',sfile)); 
-		save(sfile,'phs','timeSteps','tubes');
+		save(sfile,'reachData'); 
 
 		log_write(sprintf('Computation in the %s state is completed in %d mins',state.name,(cputime-stateT)/60));
 	end

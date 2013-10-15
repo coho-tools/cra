@@ -1,5 +1,21 @@
-function [phs,timeSteps,tubes,state] = ha_stateReach(state,init,ginv)
+function [state,reachData] = ha_stateReach(state,init,ginv)
+% [state,reachData] = ha_stateReach(state,init,ginv)
 % This function computes the reachable region of a state
+% Parameters: 
+%   state: the hybrid automata state to performe reachability computation
+%   init:  initial regions.
+%   ginv:  global invariant, empty by default. 
+% Returns: 
+%   state: updated automata, state.slices are filled.
+%   reachData: reachable data, usually large, so not added to state
+%     sets: all reachable sets 
+%     tubes: all reachable tubes
+%     timeSteps: all forward time steps
+%     faces: intersection of projectagon and invaraint constraints.
+%            The last one is for gate 0, i.e. reachable tubes.
+
+if(nargin<2), error('not enough parameters'); end;
+if(nargin<3), ginv = []; end;
 
 %% Get state information
 name = state.name; modelFunc = state.modelFunc; 
@@ -53,7 +69,7 @@ end
 initPh = ph_canon(initPh,lp_and(ginv,inv)); % no slice, no bloat
 if(ph_isempty(initPh))
 	log_write(sprintf('Empty inital region for state %s, skip the computation',state.name),true);
-	phs = cell(0,1); timeSteps = []; tubes = cell(0,1);
+  reachData = struct('sets',cell(0,1),'tubes',cell(0,1),'timeSteps',[],'faces',cell(nsg,1));
 	return;
 end
 % execute user provided functions when entering the states
@@ -63,7 +79,7 @@ if(~isempty(beforeComp))
 end
 
 % Perform reachability computation
-N = 1000; phs = cell(N,1); tubes = cell(N,1);
+N = 1000; sets = cell(N,1); tubes = cell(N,1);
 timeSteps=zeros(N,1); faces = cell(nsg,1);  
 startT = cputime; saveT = cputime; fwdT = 0; compT = 0;
 ph = initPh; prevPh = []; complete= false; fwdStep = 0; 
@@ -92,7 +108,7 @@ while(~complete)
   end
 	% nextPh/tube trimmed by bloated invariant, ph trimmed by invariant. 
 	ph = ph_canon(nextPh,inv);
-	phs{fwdStep} = ph; tubes{fwdStep} = tube; 
+	sets{fwdStep} = ph; tubes{fwdStep} = tube; 
 	timeSteps(fwdStep)=prevPh.fwd.timeStep; fwdT=fwdT+prevPh.fwd.timeStep; 
 	compT = cputime-startT;
 	cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
@@ -120,13 +136,12 @@ while(~complete)
 	if((cputime-saveT)>=3600) 
 	  path = cra_cfg('get','threadPath');
 		log_write(sprintf('Writing projectagons on to %s',path));
-		save([path,'/tmp'],'phs','tubes','timeSteps','faces');
+		save([path,'/tmp'],'sets','tubes','timeSteps','faces');
 		saveT = cputime;
 	end
 end
-phs = [{initPh};phs(1:fwdStep)]; % add the initial region
-tubes = tubes(1:fwdStep);
-timeSteps = timeSteps(1:fwdStep);
+sets = [{initPh};sets(1:fwdStep)]; % add the initial region
+tubes = tubes(1:fwdStep); timeSteps = timeSteps(1:fwdStep);
 
 % save slices for initial region of other states
 for i=1:nsg  % the end is for gate 0
@@ -139,8 +154,8 @@ for i=1:nsg  % the end is for gate 0
 	end
 end
 
+reachData = struct('sets',sets,'tubes',tubes,'timeSteps',timeSteps,'faces',faces);
 % execute user provided functions when leaving the state
 if(~isempty(afterComp)) 
-	info = struct('phs',{phs},'tubes',{tubes},'timeSteps',timeSteps,'faces',{faces}); 
-  afterComp(info); 
+  afterComp(reachData); 
 end
