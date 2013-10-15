@@ -11,4 +11,4 @@ if(isempty(tbnd)||length(tbnd)~=2), error('tbnd must be [minT,maxT]'); end;
 
 callBacks.exitCond = ha_callBacks('exitCond','stable',tbnd(1),tbnd(2));
 callBacks.sliceCond = ha_callBacks('sliceCond','stable',tbnd(1));
-state = ha_state(name,modelFunc,inv,phinfo,phOpt,callBacks); 
+state = ha_state(name,modelFunc,inv,phOpt,callBacks); 

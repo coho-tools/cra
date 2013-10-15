@@ -28,7 +28,7 @@ if(~( isempty(sources) || ischar(sources) || iscell(sources) ))
 	error('sources must be a string or a cell of strings');
 end
 if(~( isempty(initials) || isstruct(initials) || iscell(initials) ))
-	error('sources must be a projectagon structure or a cell of strings');
+	error('initials must be a projectagon structure or a cell of projectagons');
 end
 if(~( isempty(inv) || lp_iscoho(inv) ))
 	error('inv must be a COHO linear program');

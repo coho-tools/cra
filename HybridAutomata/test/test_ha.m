@@ -1,11 +1,11 @@
 function test_ha
-	test_ex1;
-%	test_ex2;
+%	test_ex1;
+	test_ex2;
 
 function test_ex2
 	% test empty hybrid automaton
 	ha = ha_create();
-	%ha_reach(ha);
+	ha_reach(ha);
 	test_get(ha);
 	
 	% test state function
@@ -18,34 +18,38 @@ function test_ex2
 	% non-coho lp
 	%inv = lp_create(rand(4,4),rand(4,1));
 	%states(end+1) = ha_state('test2',@sin,inv);
-	phinfo.type = 1; phinfo.nofield = 2;
-	states(end+1) = ha_state('test3',@sin,[],phinfo);
-	fwdOpt = ph_getOpt;
-	states(end+1) = ha_state('test4',@sin,[],[],fwdOpt);
-	states(end+1) = ha_state('test5',@sin,[],[],[],@nofunc);
-	states(end+1) = ha_state('test6',@sin,[],[],[],[],@nofunc);
-	states(end+1) = ha_state('test7',@sin,[],[],[],[],[],@nofunc);
-	states(end+1) = ha_state('test8',@sin,[],[],[],[],[],{@nofunc,@nofunc});
-	states(end+1) = ha_state('test9',@sin,[],[],[],[],[],[],@nofunc);
-	states(end+1) = ha_state('test10',@sin,[],[],[],[],[],[],[],@nofunc);
+	phOpt.type = 1; phOpt.nofield = 2; phOpt.fwdOpt = ph_getOpt;
+	states(end+1) = ha_state('test3',@sin); 
+	states(end+1) = ha_state('test4',@sin,[],phOpt);
+	callBacks.exitCond = @nofunc;
+	states(end+1) = ha_state('test5',@sin,[],[],callBacks); 
+	callBacks.sliceCond = @nofunc;
+	states(end+1) = ha_state('test6',@sin,[],[],callBacks); 
+	callBacks.beforeComp = @nofunc;
+	states(end+1) = ha_state('test7',@sin,[],[],callBacks); 
+	callBacks.afterComp = @nofunc;
+	states(end+1) = ha_state('test8',@sin,[],[],callBacks); 
+	callBacks.beforeStep= @nofunc;
+	states(end+1) = ha_state('test9',@sin,[],[],callBacks); 
+	callBacks.afterStep= @nofunc;
+	states(end+1) = ha_state('test10',@sin,[],[],callBacks); 
 	states(end+1) = ha_transState('test11',@sin);
-	states(end+1) = ha_stableState('test12',@sin,[],[],[],[],[],[],[1,2]);
-	states(end+1) = ha_fastStableState('test13',@sin,[],[],[],[],[],[],[3,4],100,[],0.1);
+	states(end+1) = ha_stableState('test12',@sin,[],[],[1,2]);
 	ha = ha_create([],states);
-	%ha_reach(ha);
+	ha_reach(ha);
 
 	
 	% test trans 
 	trans(1) = ha_trans('head',1,'tail');
 	trans(end+1) = ha_trans('head',1,'tail',@nofunc);
-	%trans(end+1) = ha_trans('head',0,'tail'); 
+	trans(end+1) = ha_trans('head',0,'tail'); 
 	%trans(end+1) = ha_trans('head',-1,'tail');
 	%ha = ha_create('bad',states,trans);
 	
 	% test ha_create
 	%ha = ha_create('empty',[],[],[1,2],cell(2,1),[],'here');
 	ha = ha_create('empty',states,[],{'test1',' '},cell(2,1),[],'here');
-	ha = ha_op(ha,'remove',{'test2','test3','test4','test5','test6','test7','test8','test9','test10','test11','test12','test13'});
+	ha = ha_op(ha,'remove',{'test2','test3','test4','test5','test6','test7','test8','test9','test10','test11','test12'});
 	ha = ha_reach(ha);
 	ha_op(ha,'disptrans');
 
@@ -78,19 +82,19 @@ function test_ex2
 
 	% test func
 	inv = lp_createByBox([0.5,0.7;0.0,0.2]);
-	phinfo.type = 1; phinfo.planes=[2,1];
-	fwdOpt = ph_getOpt('fast');
-	entryAct = @()disp('init here, hahaha');
-	stepAct = @(ph,prevPh)(ph_display(ph));
-	exitAct = @(phs,timeSteps,state)disp('exit here, haha');
-	states(1) = ha_transState('s1',@(lp)ex1_model(lp,1),inv,phinfo,fwdOpt,entryAct,stepAct,exitAct);
+	phOpt.type = 1; phOpt.planes=[2,1]; phOpt.fwdOpt = ph_getOpt('fast');
+	callBacks = [];
+	callBacks.beforeComp = @(info)disp('init here, hahaha');
+	callBacks.afterStep = ha_callBacks('afterStep','display'); 
+	callBacks.afterComp = @(info)disp('exit here, haha');
+	states(1) = ha_transState('s1',@(lp)ex1_model(lp,1),inv,phOpt); 
+	states(1) = ha_state('s1',@(lp)ex1_model(lp,1),inv,phOpt,callBacks); 
 	sources = {'s1','s2'}; 
 	dim = 2; planes = [1,2]; ph = ph_createByBox(dim,planes,[0.5,0.6;0,0.2]);
 	initials = {ph,[]};
 	ha = ha_create('func',states,trans,sources,initials);
 	ha = ha_reach(ha);
 	
-	%state = ha_state(name,modelFunc,inv,phinfo,fwdOpt,exitFunc,doSlice,entryAct,stepAct,exitAct)
 
 function test_get(ha)
 	fields = {'name','states','trans','sources','initials','inv','rpath','order','last'};

@@ -138,10 +138,10 @@ function ph = ha_beforeStep(info,method,varargin)
 		case {'default','nil'}
 			% do nothing
 		case 'display'               % Display the projectagon before each step
-			ph_display(ph,1:info.ph.ns);
+			ph_display(ph); 
 		case 'trim'                  % Trim the projectagon before each step
 			lp = varargin{1};
-			ph = ph_canon(info.ph,lp);
+			ph = ph_canon(ph,lp);
 		otherwise
 			error('do not support now');
 	end
@@ -154,10 +154,10 @@ function ph = ha_afterStep(info,method,varargin)
 		case {'default','nil'}
 			% do nothing
 		case 'display'               % Display the projectagon after each step
-			ph_display(ph,1:info.ph.ns);
+			ph_display(ph); 
 		case 'trim'                  % Trim the projectagon after each step
 			lp = varargin{1};
-			ph = ph_canon(info.ph,lp);
+			ph = ph_canon(ph,lp);
 		otherwise
 			error('do not support now');
 	end

@@ -53,7 +53,7 @@ end
 initPh = ph_canon(initPh,lp_and(ginv,inv)); % no slice, no bloat
 if(ph_isempty(initPh))
 	log_write(sprintf('Empty inital region for state %s, skip the computation',state.name),true);
-	phs = cell(0,1); timeSteps = []; 
+	phs = cell(0,1); timeSteps = []; tubes = cell(0,1);
 	return;
 end
 % execute user provided functions when entering the states
@@ -92,7 +92,7 @@ while(~complete)
   end
 	% nextPh/tube trimmed by bloated invariant, ph trimmed by invariant. 
 	ph = ph_canon(nextPh,inv);
-	phs{fwdStep} = ph; tubes{fwdStep} = tubes; 
+	phs{fwdStep} = ph; tubes{fwdStep} = tube; 
 	timeSteps(fwdStep)=prevPh.fwd.timeStep; fwdT=fwdT+prevPh.fwd.timeStep; 
 	compT = cputime-startT;
 	cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
@@ -141,6 +141,6 @@ end
 
 % execute user provided functions when leaving the state
 if(~isempty(afterComp)) 
-	info = struct('phs',phs,'tubes',tubes,'timeSteps',timeSteps,'faces',faces); 
+	info = struct('phs',{phs},'tubes',{tubes},'timeSteps',timeSteps,'faces',{faces}); 
   afterComp(info); 
 end
