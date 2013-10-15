@@ -1,6 +1,93 @@
 function test_ha
+  test_ex0;
 %	test_ex1;
-	test_ex2;
+%	test_ex2;
+
+function test_ex0
+	init = ph_createByBox(2,[1,2],[1,2;2,3]); 
+	f1 = @(lp)({int_create( eye(2),zeros(2,1),ones(2,1)*1e-6)});  
+	f2 = @(lp)({int_create(-eye(2),zeros(2,1),ones(2,1)*1e-6)});  
+  inv1 = lp_createByBox([1,3;2,4]);
+  inv2 = lp_createByBox([2,3;3,4]);
+  states(1) = ha_state('s1',f1,inv1); 
+  states(2) = ha_transState('s2',f2,inv2);
+	trans(1) = ha_trans('s1','s2');
+	ha = ha_create('ex0',states,trans,'s1',init); 
+	ha_reach(ha);
+
+function test_ex1
+	dim =2; planes=[1,2];
+	ph = ph_createByBox(dim,planes,[0.5,0.6;0.0,0.1]);
+	ph = ph_convert(ph,1);
+	
+	opt = ph_getOpt;
+	opt.object = 'ph';
+	opt.model = 'bloatAmt';
+	phOpt.fwdOpt = opt;
+
+	% state 1
+	% leave the region eventually as xdot > 0
+	name1 = 'state1';
+	modelFunc = @(lp)ex1_model(lp,1);
+	inv = lp_createByBox([0.5,1;0.0,0.1]);
+	phOpt.type = 1;       % convex, default planes 
+  callBacks.exitCond   = ha_callBacks('exitCond','transit');  % exit when empty
+  callBacks.sliceCond  = ha_callBacks('sliceCond','transit');% always slice
+	callBacks.beforeStep = @(info)ex1_step_callback(info,1,0); 
+	callBacks.afterStep  = @(info)ex1_step_callback(info,1,1); 
+	states(1) = ha_state(name1,modelFunc,inv,phOpt,callBacks);
+
+	% state 2
+	% stuck in the region as 0 is in the initial region
+	name2='state2';
+	modelFunc = @(lp)ex1_model(lp,2);
+	inv = lp_createByBox([0.9,1;0,1]);
+	phOpt.type = 2;       % bbox
+	phOpt.planes = [2,1]; % change planes
+  callBacks.exitCond   = ha_callBacks('exitCond','stable'); % exit when converge
+  callBacks.sliceCond  = ha_callBacks('sliceCond','stable');
+	callBacks.beforeStep = @(info)ex1_step_callback(info,2,0); 
+	callBacks.afterStep  = @(info)ex1_step_callback(info,2,1); 
+	states(2) = ha_state(name2,modelFunc,inv,phOpt,callBacks);
+
+	% transition
+	trans(1) = ha_trans(name1,name2,1);
+	trans(2) = ha_trans(name1,name2,2);
+	trans(3) = ha_trans(name1,name2,3);
+	trans(4) = ha_trans(name1,name2,4);
+	trans(5) = ha_trans(name1,name2,0); % test gate 0
+
+	% automata 
+	name = 'ex1';
+	inv = lp_createByBox([0.5,1;0.0,1]);
+	rpath='.';
+	ha = ha_create(name,states,trans,name1,ph,inv,rpath);
+
+	% computation
+	ha_reach(ha);
+	ha_reachOp(ha,@(phs,ts)phs_display(phs));
+
+function ldi = ex1_model(lp,state) 
+	switch(state)
+		case 1  % increase x
+			A = [1,0;0,0]; b = [0;0];
+		case 2  % increase y
+			A = [0,0;0,1]; b = [0;0];
+		otherwise
+			error('do not support');
+	end
+	u = [0;0];
+	ldi{1} = int_create(A,b,u);
+
+function ph = ex1_step_callback(info,state,boa)
+	fig = state;
+	ph = info.ph;
+	if(boa==0) % before
+		ph_display(ph,fig,[],[],'b');
+	else % after
+		ph_display(ph,fig,[],[],'r');
+		pause(1);
+	end
 
 function test_ex2
 	% test empty hybrid automaton
@@ -107,76 +194,3 @@ function test_get(ha)
 	end
 	%val = ha_get(ha,'state','foo');
 
-function test_ex1
-	dim =2; planes=[1,2];
-	ph = ph_createByBox(dim,planes,[0.5,0.6;0.0,0.1]);
-	ph = ph_convert(ph,1);
-	
-	opt = ph_getOpt;
-	opt.object = 'ph';
-	opt.model = 'bloatAmt';
-	phOpt.fwdOpt = opt;
-
-	% state 1
-	% leave the region eventually as xdot > 0
-	name1 = 'state1';
-	modelFunc = @(lp)ex1_model(lp,1);
-	inv = lp_createByBox([0.5,1;0.0,0.1]);
-	phOpt.type = 1;       % convex, default planes 
-  callBacks.exitCond   = ha_callBacks('exitCond','transit');  % exit when empty
-  callBacks.sliceCond  = ha_callBacks('sliceCond','transit');% always slice
-	callBacks.beforeStep = @(info)ex1_step_callback(info,1,0); 
-	callBacks.afterStep  = @(info)ex1_step_callback(info,1,1); 
-	states(1) = ha_state(name1,modelFunc,inv,phOpt,callBacks);
-
-	% state 2
-	% stuck in the region as 0 is in the initial region
-	name2='state2';
-	modelFunc = @(lp)ex1_model(lp,2);
-	inv = lp_createByBox([0.9,1;0,1]);
-	phOpt.type = 2;       % bbox
-	phOpt.planes = [2,1]; % change planes
-  callBacks.exitCond   = ha_callBacks('exitCond','stable'); % exit when converge
-  callBacks.sliceCond  = ha_callBacks('sliceCond','stable');
-	callBacks.beforeStep = @(info)ex1_step_callback(info,2,0); 
-	callBacks.afterStep  = @(info)ex1_step_callback(info,2,1); 
-	states(2) = ha_state(name2,modelFunc,inv,phOpt,callBacks);
-
-	% transition
-	trans(1) = ha_trans(name1,name2,1);
-	trans(2) = ha_trans(name1,name2,2);
-	trans(3) = ha_trans(name1,name2,3);
-	trans(4) = ha_trans(name1,name2,4);
-	trans(5) = ha_trans(name1,name2,0); % test gate 0
-
-	% automata 
-	name = 'ex1';
-	inv = lp_createByBox([0.5,1;0.0,1]);
-	rpath='.';
-	ha = ha_create(name,states,trans,name1,ph,inv,rpath);
-
-	% computation
-	ha_reach(ha);
-	ha_reachOp(ha,@(phs,ts)phs_display(phs));
-
-function ldi = ex1_model(lp,state) 
-	switch(state)
-		case 1  % increase x
-			A = [1,0;0,0]; b = [0;0];
-		case 2  % increase y
-			A = [0,0;0,1]; b = [0;0];
-		otherwise
-			error('do not support');
-	end
-	u = [0;0];
-	ldi{1} = int_create(A,b,u);
-
-function ph = ex1_step_callback(info,state,boa)
-	fig = state;
-	ph = info.ph;
-	if(boa==0) % before
-		ph_display(ph,fig,[],[],'b');
-	else % after
-		ph_display(ph,fig,[],[],'r');
-		pause(1);
-	end

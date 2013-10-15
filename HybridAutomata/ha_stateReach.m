@@ -89,8 +89,8 @@ while(~complete)
 
 	% Compute forward reachable sets and tubes 
 	if(~isempty(beforeStep)) % Callback before each fwdStep
-		cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
-	  ph = beforeStep(cbInfo); 
+		stepData = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
+	  ph = beforeStep(stepData); 
 	end
 	if(ph_isempty(ph)) 
 		error('Exception in state %s, projectagon to be advanced is empty.',name); 
@@ -111,16 +111,16 @@ while(~complete)
 	sets{fwdStep} = ph; tubes{fwdStep} = tube; 
 	timeSteps(fwdStep)=prevPh.fwd.timeStep; fwdT=fwdT+prevPh.fwd.timeStep; 
 	compT = cputime-startT;
-	cbInfo = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
+	stepData = struct('ph',ph,'prevPh',prevPh,'fwdStep',fwdStep,'fwdT',fwdT,'compT',compT);
 	if(~isempty(afterStep)) % Callback after each fwdStep 
-	  ph = afterStep(cbInfo); 
+	  ph = afterStep(stepData); 
 	end
 
-	complete = exitCond(cbInfo); % is the computation done? 
+	complete = exitCond(stepData); % is the computation done? 
 
   % compute the intersection slices for each gate 
-	cbInfo.complete = complete; % compute the slice or not?
-	ds = sliceCond(cbInfo);
+	stepData.complete = complete; % compute the slice or not?
+	ds = sliceCond(stepData);
 	assert(numel(ds)==1 || numel(ds)==ng+1);
 	if(length(ds)==1), ds = repmat(ds,ng+1,1); end;
 	for i = 1:nsg
@@ -154,7 +154,7 @@ for i=1:nsg  % the end is for gate 0
 	end
 end
 
-reachData = struct('sets',sets,'tubes',tubes,'timeSteps',timeSteps,'faces',faces);
+reachData = struct('sets',{sets},'tubes',{tubes},'timeSteps',timeSteps,'faces',{faces});
 % execute user provided functions when leaving the state
 if(~isempty(afterComp)) 
   afterComp(reachData); 
