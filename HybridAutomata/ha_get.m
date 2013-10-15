@@ -1,6 +1,19 @@
 function val = ha_get(ha,field,varargin)
 % val = ha_get(ha,field,varargin)
 % This function is an interface for the hybrid automaton structure
+% Field can be 
+%   name: label of the ha
+%   states: all ha states
+%   trans: all states transitions
+%   sources: source states
+%   initials: initial regions 
+%   inv: ha global invariant
+%   rpath: path to save reachable set/tubes
+%   haFile: the file for automata data
+%   stateId: given the state name, find the internal state ID
+%   stateFile: the file for state reachable sets/tubes
+%   order: order of ha states to perform reachability analysis
+%   last:  the last state id which completed rechable computation 
 
 snames = ha.snames; 
 switch(lower(field))
@@ -35,8 +48,10 @@ switch(lower(field))
 		val = ha.order;
 	case 'last'
 		val = ha.last;
+	case 'hafile' % file of this ha data
+		val = sprintf('%s/%s_ha.mat',ha.rpath,ha.name);
 	% each element
-	case 'state' 
+	case 'stateid' 
 		sname = varargin{1};
 		sid = utils_strs2ids(sname,snames); 
 		if(sid<1)
@@ -47,14 +62,12 @@ switch(lower(field))
 	case 'statefile' % file of reachable region of a state
 		sid = varargin{1};
 		if(ischar(sid))
-			sid = ha_get(ha,'sid',sid);
+			sid = ha_get(ha,'stateid',sid);
 		end
 		if(sid<1 || sid>length(snames))
 			error('sid id %d is out of range',sid);
 		end
 		val = sprintf('%s/%s_%s.mat',ha.rpath,ha.name,snames{sid});
-	case 'hafile' % file of this ha data
-		val = sprintf('%s/%s_ha.mat',ha.rpath,ha.name);
 	otherwise
 		error('do not support now');
 end

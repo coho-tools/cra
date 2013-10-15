@@ -1,4 +1,18 @@
 function ha = ha_op(ha,op,varargin)
+%  ha = ha_op(ha,op,varargin)
+%  This function modify a hybrid automatia. It supports: 
+%    'remove'/'trim':  remove states and corresponding outgoing transitions 
+%       interface:  ha = ha_opt(ha,'trim' 'state'); or 
+%                   ha = ha_opt(ha,'trim' {'state1','state2',...}); or 
+%    'cp'/'copy':      copy the reachable sets data to a new directory
+%       interface:  ha = ha_opt(ha,'cp',newpath)
+%    'mv'/'move':      move the reachable sets data to a new directory
+%       interface:  ha = ha_opt(ha,'mv',newpath)
+%    'disp'/'print'/'display': print the automata 
+%       interface:  ha = ha_opt(ha,'disp') 
+%    'dispTrans':      print the automata transition only
+%       interface:  ha = ha_opt(ha,'dispTrans') 
+
 snames = ha.snames;
 SRC=1; GATE=2; TGT=3;
 switch(lower(op))
@@ -51,10 +65,8 @@ switch(lower(op))
 		if(any(strcmpi(op,{'mv','move','rm'})))
 			utils_system('rm',ha_get(oha,'hafile'));
 		end
-	case {'slice','split'} % partition one state into several
-		error('see ph_slice');
 
-	case 'disp' % display the hybrid automaton for debug
+	case {'disp','print','display'} % display the hybrid automaton for debug
 		ns = length(snames);
 		fprintf('Hybrid automaton %s has states:\n',ha.name);
 		str='';
@@ -72,6 +84,7 @@ switch(lower(op))
 			end
 			fprintf('%s:%d\t->\t%s\n',snames{edges(i,SRC)},edges(i,GATE),to);
 		end
+
 	case 'disptrans' % display the transistion only
 		edges = ha.edges; nt = size(edges,1);
 		for i=1:nt
@@ -82,6 +95,9 @@ switch(lower(op))
 			end
 			fprintf('%s:%d\t->\t%s\n',snames{edges(i,SRC)},edges(i,GATE),to);
 		end
+
+	case {'slice','split'} % partition one state into several
+		error('see ph_slice');
 	otherwise
 		error('not implemented');
 end

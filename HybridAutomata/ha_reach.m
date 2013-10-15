@@ -1,5 +1,10 @@
 function ha  = ha_reach(ha)
+% ha  = ha_reach(ha)
 % This function computes reachable regions for all states of a hybrid automata. 
+% The computation result is added to the hybrid automata. 
+% Reachable sets and tubes are saved to disk specified by ha.rpath as they are 
+% usually very large.
+
 SRC=1; GATE=2; TGT=3; 
 
 % Get information
