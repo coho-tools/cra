@@ -90,7 +90,7 @@ function ldi = sink_model(lp)
 	A = m; b = zeros(2,1);
 	% NOTE: CRA doesn't allow error term "u" to be zero.
 	u = ones(2,1)*1e-6; %u = zeros(2,1);
-	ldi{1} = int_create(A,b,u);
+	ldi = int_create(A,b,u);
 
 % 3D Van der Pol oscillator
 % This example is 3-dim, very similar with above. 
@@ -184,7 +184,7 @@ function ldi = vdp_model_jac(lp)
 	u = [extras(x)^2*(extras(x)+3*abs(avgs(x))); ...
 		   extras(y)^2*(extras(y)+3*abs(avgs(y))); ...
 		   2*extras(x)^2];
-	ldi{1} = int_create(A,b,u); 
+	ldi = int_create(A,b,u); 
 
 % This is Ian's model which has smaller error. 
 % The basic idea is to add some constant term to b term 
@@ -202,4 +202,4 @@ function ldi = vdp_model_min(lp)
 	u = [extras(x)^3+3/2*abs(avgs(x))*extras(x)^2;...
 		   extras(y)^3+3/2*abs(avgs(y))*extras(y)^2;...
 		   extras(x)^2];
-	ldi{1} = int_create(A,b,u); 
+	ldi = int_create(A,b,u); 

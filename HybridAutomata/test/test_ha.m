@@ -5,7 +5,7 @@ function test_ha
 
 function test_ex0
 	init = ph_createByBox(2,[1,2],[1,2;2,3]); 
-	f1 = @(lp)({int_create( eye(2),zeros(2,1),ones(2,1)*1e-6)});  
+	f1 = @(lp)(int_create( eye(2),zeros(2,1),ones(2,1)*1e-6));  
 	f2 = @(lp)({int_create(-eye(2),zeros(2,1),ones(2,1)*1e-6)});  
   inv1 = lp_createByBox([1,3;2,4]);
   inv2 = lp_createByBox([2,3;3,4]);

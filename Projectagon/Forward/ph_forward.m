@@ -71,7 +71,7 @@ function poly = lps_project(lps,plane,tol,ndir)
 
 % NOTE we only support LDI now. Use function handle for extension. 
 function fwdLPs = ints_forward(lp,models,timeStep)
-	fwdLPs = cell(length(models),1);
-	for i=1:length(models)
-		fwdLPs{i} = int_forward(lp,models{i},timeStep);
+  fwdLPs = cell(length(models),1);
+  for i=1:length(models)
+    fwdLPs{i} = int_forward(lp,models{i},timeStep);
 	end

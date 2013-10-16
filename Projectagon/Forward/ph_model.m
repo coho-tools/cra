@@ -14,7 +14,9 @@ globalLP = lp_and(ph.fwd.bloatLP,opt.constraintLP);
 if(strcmpi(object,'ph')) 
 	modelLP = globalLP; 
 	%ph.fwd.modelLP = modelLP;
-	ph.fwd.models = modelFunc(modelLP);
+	models = modelFunc(modelLP);
+	if(~iscell(models)), models = {models}; end % convert LDI models to cell
+	ph.fwd.models = models; 
 	return;
 end 
 
@@ -26,7 +28,9 @@ for i=1:ph.ns
 		modelLP = lp_bloat(face.faceLP,bloatAmt);
 		modelLP = lp_and(modelLP,globalLP);
 		face.modelLP = modelLP; % save for ph_timeStep
-		face.models = modelFunc(modelLP);
+		models = modelFunc(modelLP);
+		if(~iscell(models)), models = {models}; end % convert to cell
+		face.models = models; 
 		slice.faces(j) = face;
 	end
 	ph.fwd.slices(i) = slice; 
