@@ -1,0 +1,86 @@
+This package provide an interface for reachability analysis. 
+
+A hybrid automata is consist of: 
+  Name: 
+  States: For each automata state, the state name and dynamics are required. 
+    The system dynamics is speicifed by a function of the interface: 
+        ldi = modelFunc(lp)
+      where lp is a Coho LP and ldi is a LDI model or a cell of models. 
+    State invariants are used to specify the state invariant regions. 
+      It is optional, but must be Coho LP if provided.
+      Each invariant constraint defines a 'gate', which is used for transistion.
+      During reachabilty computation, the intersection of reachable regions and 
+      'gates' are computation, the intersection are used as initial regions for 
+      other states. 
+    User can use different projectagon configuration for each state. 
+    User can provide functions to be called during reachability computation. 
+      Ususally user need to provide a function for computation termination. 
+      Another function to decide when to slice the reachable region by 'gates'. 
+      Other functions can be called before/after reachable compuations, 
+      before/after each computation steps. See ha_state.m for details. 
+    There are two built-in types of states: 
+      transistion state: the reachable region will leave the invariant region. 
+        computation is terminated when rechable region leaves the invariant, 
+        slicing is always performed. See ha_transState.m for details 
+      stable state: the reachabe region will not leave the invariant region. 
+        computation is terminated when reachable region convergesss, 
+        slicing is only performance on the last step. See ha_stableState.m 
+     
+  Transistions: Transistion between automata states. 
+    Source state and target state must be provided.
+    The gate ID of the source state is zero by default. 
+      The virtual gate 0 means the reachable regions for the source state are 
+      used as initial regions of the target state. 
+      Otherwise, the intersection of reachable regions and gate are used as 
+      initial regions of the target state. 
+    ResetMap is supported also to update the target initial regions. 
+      ph = resetMap(ph); 
+
+  Sources: Specify the source state, could be multiple states. Reachability 
+    computation is performed from these states.
+
+  Initial Regions: Initial regions of reach source state
+
+  Invariant: Global invariant for the reachable regions. 
+  
+  For details, check ha_crate
+
+
+The reachability computation is of the flow: 
+  For each state
+    % computation inital regions
+    Find all source states by transistions
+    Compute initial regions by transistion source and gates. 
+    
+    % Specify state dynamics 
+    cra_cfg('set','modelFunc',state.modelFunc); 
+
+    % Preform reachability computation
+    state.beforeComp;                 % callback
+    while(~state.exitCond) 
+      prevPh = ph;
+      state.beforeStep;               % callback
+      ph = ph_advance(ph,state.phOpt) % compute forward reachable set
+      tube = ph_succ(ph,prevPh);      % compute reachable tube 
+      state.afterStep;                % callback
+      if(state.sliceCond)
+        state.slices = ph_intersect(tube,state.inv); % slice reachable tube
+      end
+    end    
+    state.afterComp;                  % callback
+  end
+  % save all reachable data onto disk
+  
+	
+ha_state       : Create an automata state
+ha_stableState : Create a stable automata state
+ha_transState  : Create a transit automata state 
+ha_trans       : Create an automata transistion
+ha_create      : Create a hybrid automata
+ha_reach       : Perform the reachability analysis on the automata
+ha_stateReach  : Perform the reachability computation on reach automata state
+ha_callBacks   : Template functions for callbacks used in the automata state
+ha_get         : Get automata information
+ha_op          : Perform an operation on the automata
+ha_reachOp     : Perform an operation on reachable data of the automata
+

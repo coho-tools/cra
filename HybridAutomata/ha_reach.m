@@ -54,15 +54,16 @@ try
 	
 		% Save state computation result 
 		sfile = ha_get(ha,'statefile',sid);
-		log_write(sprintf('WristateTing reachable regions data to %s ...',sfile)); 
+		log_write(sprintf('Writing state reachable regions data to %s ...',sfile)); 
 		save(sfile,'reachData'); 
 
 		log_write(sprintf('Computation in the %s state is completed in %d mins',state.name,(cputime-stateT)/60));
 	end
 
 	% Save ha file at the end
-	log_write('Writing the final hybrid automata to disk ...');
-	save(ha_get(ha,'hafile'),'ha');
+	hfile = ha_get(ha,'hafile');
+	log_write('Writing the final hybrid automata to %s ...', hfile);
+	save(hfile,'ha');
 
 	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins\n',name,(cputime-haT)/60));
 catch ME
