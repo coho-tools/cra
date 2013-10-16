@@ -12,7 +12,7 @@
 %   CRA configs 
 %     modelFunc: function handle for the dynamic system
 %       values:   models = modelFunc(lp)
-%                 Given a LP, return a cell with each element as LDI model
+%                 Given a LP, return a LDI model or a cell of models. 
 %                 See int_create for LDI model.
 %       default:  @model_create
 %     tol: tolerence (not used now)
