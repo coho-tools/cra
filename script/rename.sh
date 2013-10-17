@@ -11,7 +11,7 @@ if [ "$4" ]
 then 
 	prjDir=$4;
 else
-	prjDir='~/coho';
+	prjDir='.';
 fi
 
 echo "#step1. checking if $dir/$newname.m exists ..." 

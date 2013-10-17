@@ -5,7 +5,7 @@ if [ "$2" ]
 then 
 	prjDir=$2;
 else
-	prjDir='~/coho';
+	prjDir='.';
 fi
 
 cmd="find $prjDir/ -name \"*.m\"";
