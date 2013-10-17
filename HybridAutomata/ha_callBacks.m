@@ -6,7 +6,8 @@ function func = ha_callBacks(callback, method, varargin)
 %        'default', 'transit'/'phEmpty','phConverge','maxFwdStep','maxFwdT',
 %        'maxCompT','target','stable'
 % 	  'sliceCond':  method could be:
-%        'default'/'transit'/'always', 'minFwdT', 'stable'/'complete'
+%        'default'/'transit'/'always', 'nil/never', 'minFwdT', 
+%        'stable'/'complete'
 % 	  'beforeComp': method could be: 
 %        'default'/'nil','display'
 % 	  'afterComp':  method could be: 
@@ -93,6 +94,8 @@ function dos = ha_sliceCond(info,method,varargin)
 	switch(lower(method))
 		case {'default','transit','always'}   % Slice on each step
 			dos = true;
+		case {'nil','never'}                  % Never slice 
+			dos = false;
 		case 'minfwdt'                        % Slice after some time
 			if(isempty(varargin)||isempty(varargin{1}))
 				error('minimum forward time must be provided');

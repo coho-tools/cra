@@ -85,7 +85,7 @@ startT = cputime; saveT = cputime; fwdT = 0; compT = 0;
 ph = initPh; prevPh = []; complete= false; fwdStep = 0; 
 while(~complete)
 	fwdStep = fwdStep+1;
-	log_write(sprintf('Computing forward reachable region of fwdStep %d from time %d',fwdStep,fwdT));
+	log_write(sprintf('Computing forward reachable region of step %d from time %d',fwdStep,fwdT));
 
 	% Compute forward reachable sets and tubes 
 	if(~isempty(beforeStep)) % Callback before each fwdStep
