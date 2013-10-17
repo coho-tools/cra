@@ -1,8 +1,8 @@
 function ex_pll 
   addpath('~/cra');
 	cra_open;
-	%ha = ex_pll_ha;
-	ha = ex_pll_ha_full;
+	ha = ex_pll_ha;
+	%ha = ex_pll_ha_full;
 	ha = ha_reach(ha);
 	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	cra_close;
