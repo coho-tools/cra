@@ -48,10 +48,11 @@ end %function cra_open
 function cra_addpath
 	cra_home = cra_info('cra_home'); 
 	cra_dirs = cra_info('cra_dirs'); 
-  disp('Add the following directories into Matlab search path');
+  disp('Add CRA directories into Matlab search path');
+  %disp('Add the following directories into Matlab search path');
   for i=1:length(cra_dirs)
     dirname = [cra_home,'/',cra_dirs{i}];
-    disp(sprintf('  > %s',dirname));
+    %disp(sprintf('  > %s',dirname));
     addpath(dirname); 
   end
   addpath(cra_home); 

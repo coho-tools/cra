@@ -130,8 +130,7 @@ function test_3vdp
 	disp('The computation will take long time');
 
 	% compute reachability region
-	%for p = 1:length(initPhs)
-	for p = 1; 
+	for p = 1:length(initPhs)
 		initPh = initPhs{p}; objects = OBJ{p}; maxT = maxTs(p);
 		% try all possible combinations
 		for i=1:length(objects)
