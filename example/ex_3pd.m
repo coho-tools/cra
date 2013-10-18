@@ -18,7 +18,7 @@ function ha = ex_3pd_ha
 	phOpt.fwdOpt.model = 'timeStep';
 	phOpt.fwdOpt.timeStep = 0.1; 
 
-	callBacks.exitCond = ha_callBacks('exitCond','maxFwdStep',50); 
+	callBacks.exitCond = ha_callBacks('exitCond','maxFwdStep',20); 
 	callBacks.sliceCond = @(info)(0);  % do not slice
 	states(1) = ha_state('s1',@(lp)(ex_3pd_model(lp)),[],phOpt,callBacks);
 
