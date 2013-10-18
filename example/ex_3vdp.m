@@ -10,7 +10,7 @@ function ex_3vdp
 function ha = ex_3vdp_ha
 	% states
 	phOpt.fwdOpt = ph_getOpt;
-	phOpt.fwdOpt.object = 'ph'; % Linear model with no error term
+	phOpt.fwdOpt.object = 'ph';
 	callBacks.exitCond = ha_callBacks('exitCond','maxFwdT',7); 
 	callBacks.sliceCond = @(info)(0);  % do not slice
 	states(1) = ha_state('s1',@(lp)(ex_3vdp_model(lp)),[],phOpt,callBacks);
@@ -26,6 +26,9 @@ function ha = ex_3vdp_ha
 
 	ha = ha_create('3vdp',states,[],source,initPh);
 
+% xdot = -y-x^3+x
+% ydot = x-y^3+y
+% zdot = 2x^2-2z
 function ldi = ex_3vdp_model(lp) 
 	x=1;y=2;z=3;
 	bbox = lp_box(lp);

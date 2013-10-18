@@ -26,6 +26,8 @@ function ha = ex_2sink_ha
 
 	ha = ha_create('2sink',states,[],source,initPh);
 
+% xdot = m*x
+%	m = [-2,-3;3,-2];
 function ldi = ex_2sink_model(lp) 
 	A = [-2,-3;3,-2];
 	b = zeros(2,1); u = zeros(2,1);

@@ -60,7 +60,9 @@ function ha = ex_pll_ha_full
 
 	ha = ha_create('pll',states,trans,source,initPh);
 
-
+% xdot = Ax + b
+%    A = [0,0;1,c2];
+%    b = [c1;c3];
 function ldi = ex_pll_model(lp,mode)
   p = struct('fref',2,  'g1', -0.01, 'g1_ph', -0.1, 'g2', -0.002,'cmin',0.9,...
 		         'cmax',1.1,'ccode',1.0, 'KT',0.5,'N',1,'a7',2.429570434864088);
