@@ -136,7 +136,6 @@ while(~complete)
 	if((cputime-saveT)>=3600) 
 	  path = cra_cfg('get','threadPath');
 		log_write(sprintf('Writing projectagons on to %s',path));
-		save([path,'/tmp'],'sets','tubes','timeSteps','faces','compT',compT);
 		saveT = cputime;
 	end
 end
