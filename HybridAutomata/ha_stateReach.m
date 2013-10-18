@@ -136,7 +136,7 @@ while(~complete)
 	if((cputime-saveT)>=3600) 
 	  path = cra_cfg('get','threadPath');
 		log_write(sprintf('Writing projectagons on to %s',path));
-		save([path,'/tmp'],'sets','tubes','timeSteps','faces');
+		save([path,'/tmp'],'sets','tubes','timeSteps','faces','compT',compT);
 		saveT = cputime;
 	end
 end
@@ -154,7 +154,7 @@ for i=1:nsg  % the end is for gate 0
 	end
 end
 
-reachData = struct('sets',{sets},'tubes',{tubes},'timeSteps',timeSteps,'faces',{faces});
+reachData = struct('sets',{sets},'tubes',{tubes},'timeSteps',timeSteps,'faces',{faces},'compT',compT);
 % execute user provided functions when leaving the state
 if(~isempty(afterComp)) 
   afterComp(reachData); 
