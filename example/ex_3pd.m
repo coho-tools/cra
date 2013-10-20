@@ -7,9 +7,9 @@ function ex_3pd
 	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	cra_close;
 
-% Timestep = 0.05 may be too large, make Java crashed.
-% Guess-verify is too slow and also crashed. 
-% BloatAmt does not generate correct result.
+% NOTE: This example must uses non-convex projectagon to show the V shape region
+% NOTE: The error term for x/y are zeros, so can not use face-none,
+%       or add small error to the LDI "u" term. 
 function ha = ex_3pd_ha
 	% states
 	phOpt.fwdOpt = ph_getOpt;
