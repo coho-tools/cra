@@ -11,12 +11,12 @@ echo ""
 
 echo "====Step1: Compile JAVA codes====" 
 cd $CRA_HOME/Java
-build_java.sh
+sh build_java.sh
 echo "" 
 
 echo "====Step2: Check the Java thread works correctly====" 
 cd $CRA_HOME/Java/test 
-test_java.sh
+sh test_java.sh
 echo "" 
 
 echo "====Step3: Comple C codes====" 
@@ -27,7 +27,7 @@ echo ""
 
 echo "====Step4: Check the pipe between Java and Matlab thread works correctly====" 
 cd $CRA_HOME/JavaInterface/Fork/
-test_javaif.sh
+sh test_javaif.sh
 echo "" 
 
 
