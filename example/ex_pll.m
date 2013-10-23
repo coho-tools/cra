@@ -8,13 +8,13 @@ function ex_pll
   ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
   cra_close;
 
+
 function ha = ex_pll_ha
   % Partition by sign(phase) 
   A  = [0,0,-1; 0,0,1]; 
   b1 = [2*pi;0]; b2 = [0;2*pi];
   inv1 = lp_create(A,b1); inv2 = lp_create(A,b2);
   phOpt.fwdOpt = ph_getOpt;
-  % skip them as simple
   phOpt.fwdOpt.object = 'ph'; 
   phOpt.fwdOpt.maxBloat = 0.2; 
   callBacks.exitCond = ha_callBacks('exitCond','maxFwdStep',800); 
@@ -37,13 +37,14 @@ function ha = ex_pll_ha
   inv = lp_createByBox(initBox); % must converge
   
   ha = ha_create('pll',states,trans,source,{initPh,initPh},inv);
+	
 
 % From jijie
 %   cdot = sign(ph)*-p.g1
 %   vdot = p.g2*p.fref*(c - p.cc);
 %   phdot = 1/p.N*v/c - p.fref -p.K*ph ;
 % Rewrite by x=c,y=v,z=ph
-%   xdot = a = k*p.g1;  % k=[-1,1,0,0]
+%   xdot = a = k*-p.g1;  % k=[-1,1,0,0]
 %   ydot = b*x + c;   % b = p.g2*p.fref, c = -b*p.cc;
 %   zdot = d*y/x + e*z + f; % d = 1/p.N; e = -p.K; f = -p.fref;
 % By ignorning y/x term, it's simple
@@ -165,3 +166,4 @@ function ldi = ex_pll_model_zz(lp,mode)
   err = [abs(p.g2*p.fref*dc);0];
   err = err+1e-9; % only necessary for object as 'face-none'/'face-height'
   ldi = int_create(A,b,err);
+
