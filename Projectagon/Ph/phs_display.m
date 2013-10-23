@@ -1,4 +1,5 @@
 function figs = phs_display(phs,figs,style,vars,varargin)
+if(isempty(phs)), return; end
 ise = false(length(phs),1);
 for i=1:length(phs)
 	ise(i) = ph_isempty(phs{i});
