@@ -5,7 +5,7 @@ function cra_close
 	java_close;
 	disp('Close logger'); 
 	log_close;
-	cra_rmpath;
+	%cra_rmpath; % do not remove path
 	disp('CRA resources have been released!');
 end %function cra_close
 

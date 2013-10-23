@@ -3,11 +3,11 @@ function ex_pll
   addpath('~/cra');
   cra_open;
   %ha = ex_pll_ha;
-  ha = ex_pll_ha_zz;
+  %ha = ex_pll_ha_zz;
+  ha = ex_pll_ha_slice;
   ha = ha_reach(ha);
   ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
   cra_close;
-
 
 function ha = ex_pll_ha
   % Partition by sign(phase) 
@@ -167,3 +167,31 @@ function ldi = ex_pll_model_zz(lp,mode)
   err = err+1e-9; % only necessary for object as 'face-none'/'face-height'
   ldi = int_create(A,b,err);
 
+function ha = ex_pll_ha_slice
+  % Partition by sign(phase) 
+  A  = [0,0,-1; 0,0,1]; 
+  b1 = [2*pi;0]; b2 = [0;2*pi];
+  inv1 = lp_create(A,b1); inv2 = lp_create(A,b2);
+  phOpt.fwdOpt = ph_getOpt;
+  phOpt.fwdOpt.object = 'ph'; 
+  phOpt.fwdOpt.maxBloat = 0.2; 
+  callBacks.exitCond = ha_callBacks('exitCond','phempty');
+  callBacks.afterStep = ha_callBacks('afterStep','display');
+  states(1) = ha_state('n1',@(lp)(ex_pll_model(lp,1)),inv1,phOpt,callBacks); 
+  %states(2) = ha_state('p1',@(lp)(ex_pll_model(lp,2)),inv2,phOpt,callBacks); 
+
+  % transistion
+  trans = [];
+
+  % source
+  source = 'n1';
+
+  % initial 
+  dim = 3; planes = [1,2;1,3;2,3];
+  bbox = [0.9,1.1;1.5,2.5;-2*pi,2*pi];
+  initBox = [0.9,1.1;1.5,2.5;-2*pi*1e-3,2*pi*1e-3];
+  initPh = ph_createByBox(dim,planes,initBox); 
+  initPh = ph_convert(initPh,'convex');
+  inv = lp_createByBox(bbox); % must converge
+  
+  ha = ha_create('pll_slice',states,trans,source,initPh,inv);
