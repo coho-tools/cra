@@ -96,7 +96,7 @@ while(~complete)
 		error('Exception in state %s, projectagon to be advanced is empty.',name); 
 	end
 	% foward reachable sets
-	[nextPh,prevPh] = ph_advanceSafe(ph,fwdOpt); % prevPh = ph+fwdInfo
+	[nextPh,prevPh,fwdOpt] = ph_advanceSafe(ph,fwdOpt); % prevPh = ph+fwdInfo
 	% forward reachable tubes
   if(~isempty(nextPh))
     tube = ph_succ(prevPh,nextPh); 

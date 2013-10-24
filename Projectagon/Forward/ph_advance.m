@@ -2,12 +2,12 @@ function [fwdPh,ph,opt]= ph_advance(ph,opt)
 % [fwdPh,ph,opt]= ph_advance(ph,opt)
 % This function advances a projectagon. 
 % Inputs
-%	ph: a canonical projectagon
-%	opt: seee ph_getMarchOpt. 
+%	  ph: a canonical projectagon
+%	  opt: seee ph_getOpt. 
 % Outputs:
-%	fwdPh: advanced projectagon
-%	ph: the input projectagon with an extra 'fwd' fields. 
-%	opt: the input opt with prevBloatAmt and prevTimeStep udpated.
+%	  fwdPh: advanced projectagon
+%	  ph: the input projectagon with an extra 'fwd' fields. 
+%	  opt: the input opt with prevBloatAmt and prevTimeStep udpated.
 if(nargin<1||ph_isempty(ph))
 	error('The input projectagon is empty');
 end
@@ -54,7 +54,7 @@ switch(lower(opt.model))
     %% NOTE valid may fail because of over-approx in realBloatAmt; 
 		if(~valid)
 			timeStep = ph_timeStep(ph);
-			if(timeStep > opt.timeStep)
+			if(opt.timeStep > timeStep)
 			  msg = num2str(timeStep); % return the maximum timeStep
 			  exception = MException('COHO:Projectagon:LargeTimeStep',msg); 
 			  throw(exception);
@@ -99,3 +99,4 @@ fwdPh = ph_canon(fwdPh,opt.constraintLP,opt.canonOpt);
 % update opt 
 opt.prevBloatAmt = min(maxBloat,min(bloatAmt,ph.fwd.realBloatAmt)); 
 opt.prevTimeStep = timeStep;
+
