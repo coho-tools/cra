@@ -44,7 +44,7 @@ if(~isempty(ind) || poly_area(points)<eps*max(dist))
 	rec = [bnds(1,[1,2,2,1]);bnds(2,[1,1,2,2])]; % ccw order 
 	% tranfor back to original coordinate
 	p = M*rec; 
-  p = poly_create(p);
+  %p = poly_create(p);
 else  % unchanged
 	p = points;
 end
