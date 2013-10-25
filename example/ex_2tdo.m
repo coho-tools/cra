@@ -1,12 +1,13 @@
 % This is the 2D Vdp example from "Towards Formal Verification of Analog Designs".
-% NOTE: doesn't converge well for non-osc mode. The dynamic is very sensitive to the model region.
+% NOTE: For the non-osc model, divergence on the metastable region, see simulation result. 
+% Maybe can slice again to make the converge region really tiny.
 function ex_2tdo
   addpath('~/cra');
 	cra_open;
 	disp('Working on oscillation mode');
-	ha = ex_2tdo_ha(1);
-	ha = ha_reach(ha);
-	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
+	%ha = ex_2tdo_ha(1);
+	%ha = ha_reach(ha);
+	%ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	disp('Working on non-oscillation mode');
 	ha = ex_2tdo_ha(0);
 	ha = ha_reach(ha);
@@ -58,10 +59,8 @@ function ha = ex_2tdo_ha(osc)
 	states(4) = ha_state('s4',func,inv4,phOpt,callBacks);
 	states(5) = ha_state('s5',func,inv5,phOpt,callBacks);
 	states(6) = ha_state('s6',func,inv6,phOpt,callBacks);
-	if(osc)
 	states(7) = ha_state('s7',func,inv7,phOpt,callBacks);
 	states(8) = ha_state('s8',func,inv8,phOpt,callBacks);
-	end
 
 
 	% trans
@@ -70,10 +69,8 @@ function ha = ex_2tdo_ha(osc)
 	trans(3) = ha_trans('s3','s4');
 	trans(4) = ha_trans('s4','s5');
 	trans(5) = ha_trans('s5','s6');
-	if(osc)
 	trans(6) = ha_trans('s6','s7');
 	trans(7) = ha_trans('s7','s8');
-  end
 
 	% source
 	source = 's1'; 
