@@ -1,8 +1,14 @@
 % This is the 2D Vdp example from "Towards Formal Verification of Analog Designs".
+% NOTE: doesn't converge well for non-osc mode. The dynamic is very sensitive to the model region.
 function ex_2tdo
   addpath('~/cra');
 	cra_open;
-	ha = ex_2tdo_ha;
+	disp('Working on oscillation mode');
+	ha = ex_2tdo_ha(1);
+	ha = ha_reach(ha);
+	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
+	disp('Working on non-oscillation mode');
+	ha = ex_2tdo_ha(0);
 	ha = ha_reach(ha);
 	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	cra_close;
@@ -11,7 +17,8 @@ function ex_2tdo
 % So bloatAmt should be different for V and I. Otherwise, either the timeStep 
 % is too tiny or model error is too large. So please use different maxBloat for V/I.
 % Or use Guess-verify to update bloatAmt for V/I automatically. 
-function ha = ex_2tdo_ha
+function ha = ex_2tdo_ha(osc)
+	% Slice to reduce error.
 	% states
 	phOpt.fwdOpt = ph_getOpt;
 	phOpt.fwdOpt.object = 'ph';
@@ -19,15 +26,54 @@ function ha = ex_2tdo_ha
 	phOpt.fwdOpt.maxBloat = [1e-2;1e-4]; 
 	% Do not go too fast, make the plot clear
 	phOpt.fwdOpt.maxStep = 5e-11; % 1e-10 
-	% NOTE: timeStep doesn't work well as the timeStep changes significantly during computation
-	%phOpt.fwdOpt.model = 'timeStep';
-	%phOpt.fwdOpt.timeStep = 5e-11; 
+	% NOTE: timeStep doesn't work well as the timeStep changes significantly
 	% NOTE: bloatAmt is slower
-	% phOpt.fwdOpt.model = 'bloatAmt';
-	callBacks.exitCond = ha_callBacks('exitCond','maxFwdT',1.5e-8); 
-	callBacks.sliceCond = @(info)(0);  % do not slice
-  callBacks.afterStep = ha_callBacks('afterStep','display');
-	states(1) = ha_state('s1',@(lp)(ex_2tdo_model(lp)),[],phOpt,callBacks);
+	callBacks = [];
+	%callBacks.exitCond = ha_callBacks('exitCond','phempty'); 
+	%callBacks.sliceCond = @(info)(1);  % do not slice
+	if(osc)
+	  callBacks.exitCond = @(info)(ph_isempty(info.ph)); 
+	else
+	  callBacks.exitCond = @(info)(ph_isempty(info.ph)||info.fwdT>6.5e-9);
+	end
+  %callBacks.afterStep = ha_callBacks('afterStep','display');
+  
+	% TODO: do not partition by I to save # of states
+  % partition by v=[0.055,0.35] to make moding easier. 
+  % partition by v = 0.1 because vdot close to zero when v=0.055&i\approx 1e-3;	
+	v_min = -0.1; v_max = 0.6; v_t1 = 0.055; v_t2 = 0.1; v_t3 = 0.35; 
+	i_min = -0.3e-3; i_max = 1.3e-3; i_mid = (i_min+i_max)/2; 
+	inv1 = lp_createByBox([v_t3,v_max; i_min,i_mid]);
+	inv2 = lp_createByBox([v_t2,v_t3 ; i_min,i_mid]);
+	inv3 = lp_createByBox([v_t1,v_t2 ; i_min,i_mid]);
+	inv4 = lp_createByBox([v_min,v_t1; i_min,i_mid]);
+	inv5 = lp_createByBox([v_min,v_t1; i_mid,i_max]);
+	inv6 = lp_createByBox([v_t1,v_t2 ; i_mid,i_max]);
+	inv7 = lp_createByBox([v_t2,v_t3 ; i_mid,i_max]);
+	inv8 = lp_createByBox([v_t3,v_max; i_mid,i_max]);
+	func = @(lp)(ex_2tdo_model(lp,osc));
+	states(1) = ha_state('s1',func,inv1,phOpt,callBacks);
+	states(2) = ha_state('s2',func,inv2,phOpt,callBacks);
+	states(3) = ha_state('s3',func,inv3,phOpt,callBacks);
+	states(4) = ha_state('s4',func,inv4,phOpt,callBacks);
+	states(5) = ha_state('s5',func,inv5,phOpt,callBacks);
+	states(6) = ha_state('s6',func,inv6,phOpt,callBacks);
+	if(osc)
+	states(7) = ha_state('s7',func,inv7,phOpt,callBacks);
+	states(8) = ha_state('s8',func,inv8,phOpt,callBacks);
+	end
+
+
+	% trans
+	trans(1) = ha_trans('s1','s2');
+	trans(2) = ha_trans('s2','s3');
+	trans(3) = ha_trans('s3','s4');
+	trans(4) = ha_trans('s4','s5');
+	trans(5) = ha_trans('s5','s6');
+	if(osc)
+	trans(6) = ha_trans('s6','s7');
+	trans(7) = ha_trans('s7','s8');
+  end
 
 	% source
 	source = 's1'; 
@@ -35,12 +81,15 @@ function ha = ex_2tdo_ha
   % initial 
 	% NOTE: Large I interval may cause large error on Vdot. 
 	dim = 2; planes = [1,2]; 
-	bbox = [0.4,0.5;(0.5-1e-3)*1e-3,(0.5+1e-3)*1e-3]; 
-	%bbox = [0.4,0.5;0.49*1e-3,0.5*1e-3];  % this is ok
+	bbox = [0.4,0.5;(i_mid-1e-6),(i_mid+1e-6)]; 
 	initPh = ph_createByBox(dim,planes,bbox);
 	initPh = ph_convert(initPh,'convex');
 
-	ha = ha_create('2tdo',states,[],source,initPh);
+	if(osc)
+	  ha = ha_create('2tdo_osc',states,trans,source,initPh);
+  else
+	  ha = ha_create('2tdo_nonosc',states,trans,source,initPh);
+  end
 
 % Vd_dot = 1/C*(Il-Id(Vd))
 % Il_dot = 1/L*(-Vd-R*Il+Vin)
@@ -54,51 +103,38 @@ function ha = ex_2tdo_ha
 % Id(v) = 0.0692*v^3 - 0.0421*v^2 + 0.0040*v + 8.9579e-4 (0.055<=x<=0.35)
 % Id(v) = 0.2634*v^3 - 0.2765*v^2 + 0.0968*v - 0.0112   (v>=0.35)
 
-function ldi = ex_2tdo_model(lp) 
+function ldi = ex_2tdo_model(lp,osc) 
 	x=1;y=2;
 	bbox = lp_box(lp);
 	avgs = mean(bbox,2);  extras = diff(bbox,[],2)/2;
-	t1 = 0.055; t2 = 0.35; 
+	x1 = 0.055; x2 = 0.35; 
 
 	% Linear terms
-	A1 = [0,1; -1,-200];
+	if(osc)
+	  A1 = [0,1; -1,-200]; % osc
+  else
+	  A1 = [0,1; -1,-242]; % non-osc
+	end
 	b1 = [0;0.3]; u1 = [0;0];
 
 	% Id(x) term
 	A2 = zeros(2,2); b2 = zeros(2,1); u2 = zeros(2,1);
-
-	p1 = [0;0.0545;-0.9917;6.0105];
-	p2 = [8.9579e-4;0.0040;-0.0421;0.0692];
-	p3 = [-0.0112;0.0968;-0.2765;0.2634];
-	r1 = min(t1,bbox(x,:));
-	r2 = min(t2,max(t1,bbox(x,:)));
-	r3 = max(t2,bbox(x,:));
-	[s1a,s1b,s1u] = ex_2tdo_model_help(r1,p1);
-	[s2a,s2b,s2u] = ex_2tdo_model_help(r2,p2);
-	[s3a,s3b,s3u] = ex_2tdo_model_help(r3,p3);
 	if(avgs(x)<=0.055)
-		sa = s1a; sb = s1b; su = s1u;
+	  p1 = [0;0.0545;-0.9917;6.0105];
+	  r1 = min(x1,bbox(x,:));
+	  [sa,sb,su] = ex_2tdo_model_help(r1,p1);
 	elseif(avgs(x)<=0.35)
-		sa = s2a; sb = s2b; su = s2u;
+	  p2 = [8.9579e-4;0.0040;-0.0421;0.0692];
+	  r2 = min(x2,max(x1,bbox(x,:)));
+	  [sa,sb,su] = ex_2tdo_model_help(r2,p2);
   else
-		sa = s3a; sb = s3b; su = s3u;
+	  p3 = [-0.0112;0.0968;-0.2765;0.2634];
+	  r3 = max(x2,bbox(x,:));
+	  [sa,sb,su] = ex_2tdo_model_help(r3,p3);
   end
-	% add error from other phase
-	% NOTE: the error could be smaller, but as the system converges quickly
-	% We simplify the computation by using the difference of two linear term + u
-	% (sa*x+sb) - (sia*x+sib) 
-	if(avgs(x)>t1  && bbox(x,1)<t1)
-		su = su+max(abs((sa-s1a)*bbox(x,1)+(sb-s1b)), abs((sa-s1a)*bbox(x,2)+(sb-s1b)))+s1u;
-	end
-	if((avgs(x)<=t1 && bbox(x,2)>t1) || (avgs(x)>t2 &&  bbox(x,1)<t2)) 
-		su = su+max(abs((sa-s2a)*bbox(x,1)+(sb-s2b)), abs((sa-s2a)*bbox(x,2)+(sb-s2b)))+s2u;
-  end
-	if(avgs(x)<=t2 && bbox(x,2)>t2)
-		su = su+max(abs((sa-s3a)*bbox(x,1)+(sb-s3b)), abs((sa-s3a)*bbox(x,2)+(sb-s3b)))+s3u;
-	end
 	A2(x,x) = sa; b2(x) = sb; u2(x) = su;
 
-	A = A1-A2; b = b1-b2; u = u1+u2; u = u; %+1e-9;
+	A = A1-A2; b = b1-b2; u = u1+u2; u = u+1e-9;
 	A(x,:) = 1e12*A(x,:); b(x) = b(x)*1e12; u(x) = u(x)*1e12;
 	A(y,:) = 1e6*A(y,:);  b(y) = b(y)*1e6;  u(y) = u(y)*1e6;
 	ldi = int_create(A,b,u);
