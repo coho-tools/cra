@@ -3,7 +3,6 @@ function ph = ph_model(ph,bloatAmt)
 % The function computes dynamic model required for computing forward projectagon
 % 	It assumee each point in the projectagon can move at most by bloatAmt.  
 
-
 ph = ph_face(ph,bloatAmt);
 opt = ph.fwd.opt;
 object = opt.object; 

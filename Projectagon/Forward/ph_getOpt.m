@@ -9,20 +9,22 @@ function opt = ph_getOpt(type)
 %		
 % 	The advanceOpt is a structure with the following fields
 %	I. Parameters to compute model
-% 	'model': methods to compute valid value of bloatAmt and timeStep 
+% 'model': methods to compute valid value of bloatAmt and timeStep 
 % 		valid value includes
 %			'guess-verify': guess a pair and verify at the end
 %			'bloatAmt': Use fixed bloatAmt
 %			'timeStep': use fixed timeStep
 %	'maxBloat','maxStep': maximum bloatAmt and timeStep allowed. 
+%     maxBloat can be a number, a nx1 vector (for each var) or nx2 vector (for neg/pos dir)
 %	'bloatAmt','timeStep': the value of bloatAmt or timeStep to use when 
 %			'model' is 'bloatAmt' or 'timeStep'. 
 %	'prevBloatAmt','prevTimeStep': the value of bloatAmt and timeStep of 
 %			of previous ph_advance call. It is used when 'model' is 'guess-verify'
 %	'ntries': maximum number of tries, useful only when 'model'='guess-verify'
-% 	II. Parameters to compute face
-% 	'object': methods to compute object to advance, valid value includes
-% 			'ph': advance the whole projectagon, the type of projectagon 
+% 
+% II. Parameters to compute face
+% 'object': methods to compute object to advance, valid value includes
+% 		'ph': advance the whole projectagon, the type of projectagon 
 % 					can not be 'non-convex'. 
 %			'face-all': advance all faces and project them onto all slices. 
 %			'face-none': advance faces of a slice and project them onto 
@@ -37,7 +39,8 @@ function opt = ph_getOpt(type)
 %			model error.
 %	'useInterval': indicate whether use the 'interval closure' method to find
 %			more accurate face or not for 'non-convex' projectagon. 
-% 	III. Error control
+%
+% III. Error control
 %	'tol': 	tolerrence used to simplify the polygons. 
 %	'riters','reps': To reduce model error, ph_advance repeats computation
 %			with smaller bloatAmt. The loop exits either the number of 

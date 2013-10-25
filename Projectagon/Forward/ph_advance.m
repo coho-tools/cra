@@ -17,8 +17,20 @@ end
 ph_checkOpt(opt,ph);
 
 dim = ph.dim; 
-ph.fwd.opt = opt; 
+% update size of maxBloat
 maxBloat = opt.maxBloat; 
+switch(numel(maxBloat))
+	case 1
+		maxBloat = repmat(maxBloat,dim,2);
+	case dim
+		maxBloat = repmat(maxBloat(:),1,2);
+	case 2*dim
+		maxBloat = reshape(maxBloat,dim,2);
+	otherwise
+		error('incorrect number of maxBloat');
+end
+opt.maxBloat = maxBloat;
+ph.fwd.opt = opt; 
 
 % break polygons
 if(~ph.iscanon), ph = ph_canon(ph); end;
@@ -28,7 +40,7 @@ ph = ph_smash(ph);
 switch(lower(opt.model))
 	case 'bloatamt' % fixed bloatAmt
 		if(isempty(opt.bloatAmt))
-			bloatAmt = maxBloat*ones(dim,2);
+			bloatAmt = maxBloat; 
 		else
 			bloatAmt = opt.bloatAmt;
 		end
@@ -46,7 +58,7 @@ switch(lower(opt.model))
 %%		  [valid,ph] = ph_verify(ph);
 %%		end
 	case 'timestep' % fixed timeStep
-		bloatAmt = maxBloat*ones(dim,2);
+		bloatAmt = maxBloat; 
 		timeStep = opt.timeStep;
 		ph = ph_model(ph,bloatAmt);
 		ph = ph_forward(ph,timeStep);

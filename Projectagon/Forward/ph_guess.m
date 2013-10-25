@@ -1,5 +1,5 @@
 function [bloatAmt,timeStep,ph,check] = ph_guess(ph)
-opt = ph.fwd.opt;
+opt = ph.fwd.opt; 
 maxBloat = opt.maxBloat; maxStep = opt.maxStep;
 
 % parameters
@@ -14,7 +14,7 @@ if(~isfield(ph.fwd,'tries'))  % initial guess
 		bloatAmt = prevBloatAmt; 
 		timeStep = prevTimeStep; 
 	else  % from maxBloat
-		bloatAmt = maxBloat*ones(ph.dim,2); 
+		bloatAmt = maxBloat;
 		ph = ph_model(ph,bloatAmt); 
 		[timeStep, ph] = ph_timeStep(ph); 
 		timeStep = magic*timeStep; 
@@ -24,7 +24,7 @@ else % guess based on previous failure
 	if(ph.fwd.tries<=opt.ntries)
 		bloatAmt = ph.fwd.bloatAmt; timeStep = ph.fwd.timeStep;
 		realBloatAmt = ph.fwd.realBloatAmt;
-		r = max(realBloatAmt(:))/maxBloat; % the gap of bloatAmt and maxBloat
+		r = max(realBloatAmt(:)./maxBloat(:)); % the gap of bloatAmt and maxBloat
 		if(r<minGap) % bloatAmt is small
 			bloatAmt = max(bloatAmt,realBloatAmt)*bloatInc; % increase bloatAmt
 		else % timeStep is large
@@ -33,7 +33,7 @@ else % guess based on previous failure
 			timeStep = timeStep*min(maxR,max(minR,bgap));
 		end
 	else % Too many failure, use 'bloatAmt'
-		bloatAmt = maxBloat*ones(ph.dim,2);
+		bloatAmt = maxBloat;
 		ph = ph_model(ph,bloatAmt);
 		[timeStep,ph] = ph_timeStep(ph);
 		% Reduce timeStep further to ensure correctness even with computation error 
@@ -45,7 +45,7 @@ end
 ph.fwd.tries = ph.fwd.tries+1;
 
 % make sure the bloatAmt and timeStep is not too tiny.
-r = max(bloatAmt(:))/maxBloat; 
+r = max(bloatAmt(:)./maxBloat(:)); 
 % NOTE it is possible r=0 when object='ph' and realBloatAmt=0;
 if(r>0 && r < minGap) 
 	bloatAmt = bloatAmt/r; 

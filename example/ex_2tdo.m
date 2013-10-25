@@ -7,26 +7,26 @@ function ex_2tdo
 	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	cra_close;
 
-% NOTE: This is an example where "bloatAmt" method doesn't work well. 
-% This is because V is much large then I, so does the bloatAmt. 
-% So if the bloatAmt is suitable for I, it's too small for V. 
-% If it's suitable for V, the model error from I is too large.
-% Guess-verify can handel this automatically. 
-% Another solution is to support matrix in opt.maxBloat.
+% NOTE: In this example, the magitute of V and I have significant difference. 
+% So bloatAmt should be different for V and I. Otherwise, either the timeStep 
+% is too tiny or model error is too large. So please use different maxBloat for V/I.
+% Or use Guess-verify to update bloatAmt for V/I automatically. 
 function ha = ex_2tdo_ha
 	% states
 	phOpt.fwdOpt = ph_getOpt;
 	phOpt.fwdOpt.object = 'ph';
-	% default 0.1 is too large for I.
-	phOpt.fwdOpt.maxBloat = 1e-2; 
+	% NOTE: large maxBloat introduce large model error, esp for I.
+	phOpt.fwdOpt.maxBloat = [1e-2;1e-4]; 
 	% Do not go too fast, make the plot clear
-	phOpt.fwdOpt.maxStep =  5e-11; 
+	phOpt.fwdOpt.maxStep = 5e-11; % 1e-10 
 	% NOTE: timeStep doesn't work well as the timeStep changes significantly during computation
 	%phOpt.fwdOpt.model = 'timeStep';
 	%phOpt.fwdOpt.timeStep = 5e-11; 
+	% NOTE: bloatAmt is slower
+	% phOpt.fwdOpt.model = 'bloatAmt';
 	callBacks.exitCond = ha_callBacks('exitCond','maxFwdT',1.5e-8); 
 	callBacks.sliceCond = @(info)(0);  % do not slice
-  %callBacks.afterStep = ha_callBacks('afterStep','display');
+  callBacks.afterStep = ha_callBacks('afterStep','display');
 	states(1) = ha_state('s1',@(lp)(ex_2tdo_model(lp)),[],phOpt,callBacks);
 
 	% source
@@ -36,6 +36,7 @@ function ha = ex_2tdo_ha
 	% NOTE: Large I interval may cause large error on Vdot. 
 	dim = 2; planes = [1,2]; 
 	bbox = [0.4,0.5;(0.5-1e-3)*1e-3,(0.5+1e-3)*1e-3]; 
+	%bbox = [0.4,0.5;0.49*1e-3,0.5*1e-3];  % this is ok
 	initPh = ph_createByBox(dim,planes,bbox);
 	initPh = ph_convert(initPh,'convex');
 
@@ -96,9 +97,8 @@ function ldi = ex_2tdo_model(lp)
 		su = su+max(abs((sa-s3a)*bbox(x,1)+(sb-s3b)), abs((sa-s3a)*bbox(x,2)+(sb-s3b)))+s3u;
 	end
 	A2(x,x) = sa; b2(x) = sb; u2(x) = su;
-	u2(x) = 0;
 
-	A = A1-A2; b = b1-b2; u = u1+u2; u = u+1e-9;
+	A = A1-A2; b = b1-b2; u = u1+u2; u = u; %+1e-9;
 	A(x,:) = 1e12*A(x,:); b(x) = b(x)*1e12; u(x) = u(x)*1e12;
 	A(y,:) = 1e6*A(y,:);  b(y) = b(y)*1e6;  u(y) = u(y)*1e6;
 	ldi = int_create(A,b,u);

@@ -31,13 +31,17 @@ for i=1:length(names)
 					'timeStep'})))
 				error(['opt.',name,' can only be [''guess-verify''|''bloatAmt''|''timeStep'']']);
 			end
+		case {'maxEdgeLen','maxStep'}
+			if(~isfloat(value)||value<=0)
+				error(['opt.',name,' must be a positive value']);
+			end
 		case {'timeStep','prevTimeStep'}
 			if(isempty(value)), continue; end
 			if(~isfloat(value)||value<=0)
 				error(['opt.',name,' must be a positive value']);
 			end
-		case {'bloatAmt','prevBloatAmt'}
-			if(isempty(value)), continue; end
+		case {'maxBloat','bloatAmt','prevBloatAmt'}
+			if(isempty(value)&&~strcmp(name,'maxBloat')), continue; end
 			if(~isfloat(value)||any(value(:)<0))
 				error(['opt.',name,' must be a non-negative value']);
 			end
@@ -47,11 +51,6 @@ for i=1:length(names)
 					error(['the size of opt.',name,' can only be [1,',dim,',',dim*2,']']);
 				end
 			end
-		case {'maxEdgeLen','maxBloat','maxStep'}
-			if(~isfloat(value)||value<=0)
-				error(['opt.',name,' must be a positive value']);
-			end
-		%
 		case 'object'
 			if(~ischar(value)||~any(strcmpi(value,{'ph','face-all',...
 					'face-none','face-bloat','face-height'})))
@@ -100,10 +99,10 @@ end
 if(~isempty(opt.prevTimeStep)&&opt.prevTimeStep>opt.maxStep)
 	error('opt.prevTimeStep can not be greater than opt.maxStep');
 end
-if(~isempty(opt.bloatAmt)&&any(opt.bloatAmt(:)>opt.maxBloat))
+if(~isempty(opt.bloatAmt)&&any(opt.bloatAmt(:)>opt.maxBloat(:)))
 	error('opt.bloatAmt can not be greater than opt.maxBloat');
 end
-if(~isempty(opt.prevBloatAmt)&&any(opt.prevBloatAmt(:)>opt.maxBloat))
+if(~isempty(opt.prevBloatAmt)&&any(opt.prevBloatAmt(:)>opt.maxBloat(:)))
 	error('opt.prevBloatAmt can not be greater than opt.maxBloat');
 end
 

@@ -3,16 +3,16 @@ function ph = ph_face(ph,bloatAmt)
 
 % compute bloatAmt and bloatLP
 dim = ph.dim;
-switch(numel(bloatAmt))
-	case 1
-		bloatAmt = repmat(bloatAmt,dim,2);
-	case dim
-		bloatAmt = repmat(bloatAmt(:),1,2);
-	case 2*dim
-		bloatAmt = reshape(bloatAmt,dim,2);
-	otherwise
-		error('incorrect number of bloatAmt');
-end
+%switch(numel(bloatAmt))
+%	case 1
+%		bloatAmt = repmat(bloatAmt,dim,2);
+%	case dim
+%		bloatAmt = repmat(bloatAmt(:),1,2);
+%	case 2*dim
+%		bloatAmt = reshape(bloatAmt,dim,2);
+%	otherwise
+%		error('incorrect number of bloatAmt');
+%end
 ph.fwd.bloatAmt = bloatAmt;
 ph.fwd.bloatLP = lp_bloat(ph.fwd.lp,bloatAmt);
 % get opt
