@@ -1,13 +1,14 @@
 % This is the 2D Vdp example from "Towards Formal Verification of Analog Designs".
 % NOTE: For the non-osc model, divergence on the metastable region, see simulation result. 
 % Use slicing to reduce error 
+% See ex_2tdo_cs for more accurate result by using changing variables 
 function ex_2tdo
   addpath('~/cra');
 	cra_open;
 	disp('Working on oscillation mode');
-	%ha = ex_2tdo_ha(1);
-	%ha = ha_reach(ha);
-	%ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
+	ha = ex_2tdo_ha(1);
+	ha = ha_reach(ha);
+	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	disp('Working on non-oscillation mode');
 	ha = ex_2tdo_ha(0);
 	ha = ha_reach(ha);
