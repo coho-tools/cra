@@ -1,13 +1,14 @@
 % This is the 2D Vdp example from "Towards Formal Verification of Analog Designs".
 % NOTE: For the non-osc model, divergence on the metastable region, see simulation result. 
 % Use slicing to reduce error 
+% This is similar with ex_2tdo, but changing variables to reduce error
 function ex_2tdo
   addpath('~/cra');
 	cra_open;
 	disp('Working on oscillation mode');
-	%ha = ex_2tdo_ha(1);
-	%ha = ha_reach(ha);
-	%ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
+	ha = ex_2tdo_ha(1);
+	ha = ha_reach(ha);
+	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 	disp('Working on non-oscillation mode');
 	ha = ex_2tdo_ha(0);
 	ha = ha_reach(ha);
@@ -24,7 +25,7 @@ function ha = ex_2tdo_ha(osc)
 	phOpt.fwdOpt = ph_getOpt;
 	phOpt.fwdOpt.object = 'ph';
 	% NOTE: large maxBloat introduce large model error, esp for I.
-	phOpt.fwdOpt.maxBloat = [1e-2;1e-4]; 
+	phOpt.fwdOpt.maxBloat = 0.02; 
 	% Do not go too fast, make the plot clear
 	phOpt.fwdOpt.maxStep = 5e-11; % 1e-10 
 	% NOTE: timeStep doesn't work well as the timeStep changes significantly
@@ -38,10 +39,10 @@ function ha = ex_2tdo_ha(osc)
   % partition by v = 0.1 because vdot close to zero when v=0.055&i\approx 1e-3;	
 	if(osc)
 	  v_min = -0.1; v_max = 0.6; v_t1 = 0.055; v_t2 = 0.1; v_t3 = 0.35; 
-	  i_min = -0.3e-3; i_max = 1.3e-3; i_mid = (i_min+i_max)/2; 
+	  i_min = -0.3; i_max = 1.3; i_mid = (i_min+i_max)/2; 
 	else
 	  v_min = -0.1; v_max = 0.6; v_t10 = 0.04; v_t1=0.055; v_t20 = 0.07; v_t2 = 0.1; v_t3 = 0.35; 
-	  i_min = -0.3e-3; i_max = 1.3e-3; i_mid = (i_min+i_max)/2; i_t1 = 0.9e-3; i_t2 = 0.95e-3; i_t3 = 0.98e-3;
+	  i_min = -0.3; i_max = 1.3; i_mid = (i_min+i_max)/2; i_t1 = 0.9; i_t2 = 0.95; i_t3 = 0.98; 
 	end
 	inv1 = lp_createByBox([v_t3,v_max; i_min,i_mid]);
 	inv2 = lp_createByBox([v_t2,v_t3 ; i_min,i_mid]);
@@ -97,9 +98,9 @@ function ha = ex_2tdo_ha(osc)
 	initPh = ph_convert(initPh,'convex');
 
 	if(osc)
-	  ha = ha_create('2tdo_osc',states,trans,source,initPh);
+	  ha = ha_create('2tdo_cs_osc',states,trans,source,initPh);
   else
-	  ha = ha_create('2tdo_nonosc',states,trans,source,initPh);
+	  ha = ha_create('2tdo_cs_nonosc',states,trans,source,initPh);
   end
 
 % Vd_dot = 1/C*(Il-Id(Vd))
@@ -113,6 +114,10 @@ function ha = ex_2tdo_ha(osc)
 % Id(v) = 6.0105*v^3 - 0.9917*v^2 + 0.0545*v            (x<=0.055)
 % Id(v) = 0.0692*v^3 - 0.0421*v^2 + 0.0040*v + 8.9579e-4 (0.055<=x<=0.35)
 % Id(v) = 0.2634*v^3 - 0.2765*v^2 + 0.0968*v - 0.0112   (v>=0.35)
+% 
+% let xx = x; yy = y*1e3
+%  xxdot = (1e-3*yy - Id(xx))*1e12 
+%  yydot = 1e3*ydot = (0.3-xx-0.2yy)*1e9
 
 function ldi = ex_2tdo_model(lp,osc) 
 	x=1;y=2;
@@ -122,9 +127,9 @@ function ldi = ex_2tdo_model(lp,osc)
 
 	% Linear terms
 	if(osc)
-	  A1 = [0,1; -1,-200]; % osc
+	  A1 = [0,1/1e3; -1,-200/1e3]; % osc
   else
-	  A1 = [0,1; -1,-242]; % non-osc
+	  A1 = [0,1/1e3; -1,-242/1e3]; % non-osc
 	end
 	b1 = [0;0.3]; u1 = [0;0];
 
@@ -145,14 +150,11 @@ function ldi = ex_2tdo_model(lp,osc)
   end
 	A2(x,x) = sa; b2(x) = sb; u2(x) = su;
 
-	% NOTE: Add some error here, otherwise, zero error make projection error (poly_regu) even larger.
-	A = A1-A2; b = b1-b2; u = u1+u2; u = u+1e-12;
+	A = A1-A2; b = b1-b2; u = u1+u2; %u = u+1e-9;
 	A(x,:) = 1e12*A(x,:); b(x) = b(x)*1e12; u(x) = u(x)*1e12;
-	A(y,:) = 1e6*A(y,:);  b(y) = b(y)*1e6;  u(y) = u(y)*1e6;
+	A(y,:) = 1e9*A(y,:);  b(y) = b(y)*1e9;  u(y) = u(y)*1e9;
 	ldi = int_create(A,b,u);
 	
-
-
 function [A,b,err]= ex_2tdo_model_help(r,p)
 %   This function creates linear approximation of polynomials. 
 %    f(x) = p(4)*x^3+p(3)*x^2+p(2)*x+p(1)
