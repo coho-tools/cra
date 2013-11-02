@@ -2,11 +2,25 @@
 function ex_pll 
   addpath('~/cra');
   cra_open;
+
+	%disp('Working on full model');
   %ha = ex_pll_ha;
+  %ha = ha_reach(ha);
+
+	%disp('Working on transformed model for zig-zag computation');
   %ha = ex_pll_ha_zz;
-  ha = ex_pll_ha_slice;
+  %ha = ha_reach(ha);
+
+	%disp('Working on full model with init region where theta is zero');
+  %ha = ex_pll_ha_slice;
+  %ha = ha_reach(ha);
+
+	disp('Working on full model to compute maximum lock time'); 
+  ha = ex_pll_ha_init;
   ha = ha_reach(ha);
+
   ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
+
   cra_close;
 
 function ha = ex_pll_ha
@@ -167,6 +181,7 @@ function ldi = ex_pll_model_zz(lp,mode)
   err = err+1e-9; % only necessary for object as 'face-none'/'face-height'
   ldi = int_create(A,b,err);
 
+% start to compute from \theta = 0;
 function ha = ex_pll_ha_slice
   % Partition by sign(phase) 
   A  = [0,0,-1; 0,0,1]; 
@@ -193,5 +208,56 @@ function ha = ex_pll_ha_slice
   initPh = ph_createByBox(dim,planes,initBox); 
   initPh = ph_convert(initPh,'convex');
   inv = lp_createByBox(bbox); % must converge
-  
   ha = ha_create('pll_slice',states,trans,source,initPh,inv);
+
+% compute converge time for a given inital region	
+% too many zig-zag, large state transition error
+function ha = ex_pll_ha_init
+	% For full model state
+  bbox = [0.9,1.1;1.5,2.5;-2*pi,2*pi];
+  inv = lp_createByBox(bbox); % must converge
+  inv1 = lp_and(lp_create([0,0,1],0),inv); inv2 = lp_and(lp_create([0,0,-1],0),inv);
+	% For zig-zag state
+  bbox = [-0.3,0.3;-2*pi,2*pi];
+  zinv = lp_createByBox(bbox); % must converge
+  zinv1 = lp_and(lp_create([0,1],0),zinv); zinv2 = lp_and(lp_create([0,-1],0),zinv);
+  % phOpt
+  phOpt.fwdOpt = ph_getOpt;
+  phOpt.fwdOpt.object = 'ph'; 
+  phOpt.fwdOpt.maxBloat = 0.2; 
+	% callBacks
+  callBacks.exitCond = ha_callBacks('exitCond','phempty');
+  callBacks.sliceCond =  @(info)(1);  % skip slice the initial region
+	% converge to c=lo,v=~1.8,theta=0
+  states(1) = ha_state('n1',@(lp)(ex_pll_model(lp,1)),inv1,phOpt,callBacks); 
+	% zigzag
+  phOpt.fwdOpt.maxBloat = 0.001; % w and theta are small
+  callBacks.sliceCond =  @(info)(info.fwdStep>1);  % skip slice the initial region
+  states(2) = ha_state('p1',@(lp)(ex_pll_model_zz(lp,2)),zinv2,phOpt,callBacks); 
+
+	% compute w
+	resetMap = @ex_pll_resetMap;
+	trans(1) = ha_trans('n1','p1',1,resetMap);
+
+  % source
+  source = 'n1';
+
+  % initial 
+  dim = 3; planes = [1,2;1,3;2,3];
+  initBox = [1.1,1.1; 1.5,1.5; -2*pi,-2*pi] + repmat([-0.01,0.01],3,1);  % \theta = neg , c = hi and v = lo
+  initPh = ph_createByBox(dim,planes,initBox); 
+  initPh = ph_convert(initPh,'convex');
+  
+  ha = ha_create('pll_init',states,trans,source,initPh); 
+
+% convert [c,v,theta] to [w,theta]
+% w = fdco - fref 
+%   = v/c - 2;
+function ph = ex_pll_resetMap(ph)
+	c = 1; v = 2; theta = 3;
+	bbox = ph.bbox;
+	w_min = bbox(v,1)/bbox(c,2)-2;
+	w_max = bbox(v,2)/bbox(c,1)-2;
+	nbbox = [w_min,w_max;bbox(theta,:)];
+	ph = ph_createByBox(2,[1,2],nbbox);
+	ph = ph_convert(ph,'convex');
