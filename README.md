@@ -1,3 +1,6 @@
+CRA: Coho Reachability Analysis Tool
+
+FAQ: 
 =====================
 1. How to install CRA
    sh install.sh
@@ -16,6 +19,7 @@
    cra_close;   
 =====================
 3. Any more examples ?
+   ./example/
    ./Projectagon/test/
 =====================
 4. What's LDI models
