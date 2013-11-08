@@ -1,0 +1,72 @@
+%% BEGIN lp_opt
+println('%TRANSACTION 1\n');
+A = matrix([
+ [$bff0000000000000, $8000000000000000 ] ; 
+ [$8000000000000000, $bff0000000000000 ] ; 
+ [$3ff0000000000000, $0000000000000000 ] ; 
+ [$0000000000000000, $3ff0000000000000 ] 
+ ]);
+b = matrix([
+ [$bff0000000000000 ] ; 
+ [$bff0000000000000 ] ; 
+ [$8000000000000000 ] ; 
+ [$8000000000000000 ] 
+ ]);
+Aeq = matrix([
+ [], [] ]);
+beq = transpose(matrix([[]]));
+pos = boolMatrix([
+ [$0000000000000000 ] ; 
+ [$0000000000000000 ] 
+ ]);
+lp = lpGeneral(Aeq, beq, A, b, pos);
+f = matrix([
+ [$3ff0000000000000 ] ; 
+ [$3ff0000000000000 ] 
+ ]);
+lpSoln = lp_opt(lp, f);
+println(lp_status(lpSoln));
+println('\n');
+println('\n');
+println(lp_cost(lpSoln),'hex');
+println(lp_point(lpSoln),'hex');
+println(lp_basis(lpSoln),'hex');
+println('\n');
+println('\n');
+%% END lp_opt
+%% BEGIN lp_project
+println('%TRANSACTION 2\n');
+A = matrix([
+ [$bff0000000000000, $8000000000000000 ] ; 
+ [$8000000000000000, $bff0000000000000 ] ; 
+ [$3ff0000000000000, $0000000000000000 ] ; 
+ [$0000000000000000, $3ff0000000000000 ] 
+ ]);
+b = matrix([
+ [$bff0000000000000 ] ; 
+ [$bff0000000000000 ] ; 
+ [$8000000000000000 ] ; 
+ [$8000000000000000 ] 
+ ]);
+Aeq = matrix([
+ [], [] ]);
+beq = transpose(matrix([[]]));
+pos = boolMatrix([
+ [$0000000000000000 ] ; 
+ [$0000000000000000 ] 
+ ]);
+lp = lpGeneral(Aeq, beq, A, b, pos);
+xx = matrix([
+ [$3ff0000000000000 ] ; 
+ [$0000000000000000 ] 
+ ]);
+yy = matrix([
+ [$0000000000000000 ] ; 
+ [$3ff0000000000000 ] 
+ ]);
+lpProj = lp_project(lp, xx, yy, 0.001000);
+println(lp_point(lpProj),'hex');
+println('\n');
+println('\n');
+%% END lp_project
+exit();
