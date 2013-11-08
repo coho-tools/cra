@@ -1,0 +1,8 @@
+The code is to call LP solver implemented in C/C++. 
+However, C/C++ is not platform independent, so we don't support it anymore. 
+Codes are in ccode.tgz file 
+
+to use c solver, add the current path to Djava.library.path
+like 
+#java -Djava.library.path=./ -classpath ../../ coho.jni.CCohoLPSolver
+

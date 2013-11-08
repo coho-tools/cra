@@ -1,0 +1,102 @@
+BasicValue.java:				throw new EvalException("usage:  " + name() + "(arg1, arg2)");
+BasicValue.java:							throw new EvalException("usage:  " + name() + "(v)");
+BasicValue.java:							throw new EvalException("usage:  " + name() + "(v)");
+LPstuff.java:							"usage:  " + name() + "(A_eq, b_eq, A_ineq, b_ineq [, [pos [, fwd,bwd]])");
+LPstuff.java:			public String usage() { return("usage:  " + longName()); }
+LPstuff.java:				if((args.size() < 3 || args.size() >4)) throw new EvalException(usage());
+LPstuff.java:			public String usage() { return("usage: (lp[,c]) "); }
+LPstuff.java:				if((args.size() != 1 && args.size()!=2)) throw new EvalException(usage());
+LPstuff.java:			public String usage() { return("usage:  " + longName()); }
+LPstuff.java:				if((args.size() != 1)) throw new EvalException(usage());
+LPstuff.java:				else throw new EvalException(usage());
+LPstuff.java:			public String usage() { 
+LPstuff.java:				return("usage:  " + longName()); 
+LPstuff.java:					throw new EvalException(usage());
+LPstuff.java:					throw new EvalException(usage());
+LPstuff.java:			public String usage() { 
+LPstuff.java:				return("usage:  " + longName()); 
+LPstuff.java:					throw new EvalException(usage());
+LPstuff.java:					throw new EvalException(usage());
+LPstuff.java:			public String usage() { return("usage:  " + longName()); }
+LPstuff.java:				if((args.size() != 1)) throw new EvalException(usage());
+LPstuff.java:				else throw new EvalException(usage());
+MatrixValue.java:			throw new EvalException("usage:  " + who + "(row or column)");
+MatrixValue.java:					throw new EvalException("usage:  " + name() + "(lo, hi)");
+MatrixValue.java:					throw new EvalException("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException("usage:  " + name() + "(vector)");
+MatrixValue.java:					throw new EvalException("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException("usage:  " + name() + "(matrix, n)");
+MatrixValue.java:					"usage: submatrix(matrix, rowRange, colRange)");
+MatrixValue.java:					"usage: block_copy(dst, src, row0, col0)");
+MatrixValue.java:					throw new EvalException("usage: all(matrix)");
+MatrixValue.java:					throw new EvalException("usage: any(matrix)");
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix, row-specifier)\n"
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix, row-specifier)\n"
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix, matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix, matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:		// public String usage() {
+MatrixValue.java:		// return("usage: " + name() + "(matrix)");
+MatrixValue.java:		// if(args.size() != 1) throw new EvalException(usage());
+MatrixValue.java:			public String usage() {
+MatrixValue.java:				return ("usage:  " + name() + "(matrix)");
+MatrixValue.java:					throw new EvalException(usage());
+MyParser.java:	private static void usage() {
+MyParser.java:		"usage:  java Coho.geom.interp.MyParser [-p prompt] [-l inLogFile] [-o outLogFile]");
+MyParser.java://				if(args.length <= i+1) usage();
+MyParser.java:				if(args.length <= i+1) usage();
+MyParser.java:				if(args.length<=i+1) usage();
+PolygonValue.java:					throw new EvalException("usage: polygon(row/col)");
+PolygonValue.java:					throw new EvalException("usage: hull(polygon)");
+PolygonValue.java:					throw new EvalException("usage: reduce(polygon, [errtol,[edgeReducible] ] ])");
+PolygonValue.java:					throw new EvalException("usage: reduce(polygon, errtol])");

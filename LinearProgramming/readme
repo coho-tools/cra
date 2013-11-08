@@ -1,0 +1,43 @@
+This package provide linear program solvers and projection solvers. 
+For both LP and projection, we provide a Java based solution. 
+The Java solver is robust (using arbitration precesion rational numbers). 
+To improve performance, we can use other solvers (e.g. matlab or cplex). 
+If these solvers failed, we can use Java solver then.
+We also have a matlab projection solver, but its overapproximation error may be huge. 
+
+// Create a LP
+  lp_create       : create a lp
+  lp_createByBox  : create a lp from bounding box
+  lp_createByHull : create a lp from convex hull
+  lp_rand         : create a random lp
+
+// Basic check
+  lp_feasible     : check if the lp is feasible or not
+  lp_isempty      : check if the lp is empty (no constraints)
+  lp_norm         : check if the lp is a normal lp
+  lp_iscoho       : check if the lp is coho (or dual) lp
+  lp_sat          : check if a point satisfies the lp or not
+
+// Get LP info
+  lp_dims         : return dimensions of lp 
+  lp_get          : get lp constraints values
+
+// Set LP info and LP opertions
+  lp_bloat        : bloat the lp outward 
+  lp_operate      : perform operations on constraints
+  lp_convert      : convert equality constraints to inequality constraints
+  lp_unique       : remove redundant constraints
+  lp_and          : intersection of two lps 
+  lp_box          : compute bounding box of a lp
+  lp_pickup       : project lp onto lower dimensions (over-approximation)
+
+// LP solvers
+  Solver/lp_opt   : lp solver interface
+  Solver/lp_solve : various lp solvers impelmentation
+  Solver/CPLEX    : package to call cplex solver
+
+// Projection solvers
+  Project/lp_project:  lp projection solver interface
+  Project/lp_projectAsympt: matlab projection solver
+  Project/lp_hulls:    functions for matlab solver
+
