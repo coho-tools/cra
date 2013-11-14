@@ -37,7 +37,6 @@ function ha = ex_3plane_ha
 function ldi = ex_3plane_model(lp) 
 	x=1;y=2;z=3;
 	bbox = lp_box(lp);
-	avgs = mean(bbox,2);  extras = diff(bbox,[],2)/2;
 	d = -1; u = 1; v = 10;
 
 	minZ = bbox(z,1); maxZ = bbox(z,2); 
@@ -57,9 +56,9 @@ function ldi = ex_3plane_model(lp)
 	     -u, 0, 0; ...
 	     0, 0 ,0];
   b = [-v; 0; (d-u)]; % d and u are constant
-	b(1) = b(1)+v*(minCosZ+maxCosZ)/2;
-	b(2) = b(2)+v*(minSinZ+maxSinZ)/2;
-	err(1) = v*(maxCosZ-minCosZ)/2; 
-	err(2) = v*(maxSinZ-minSinZ)/2;
-	err(3) = 1e-9; % d,u is determined, so zero.
+	b(x) = b(x)+v*(minCosZ+maxCosZ)/2;
+	b(y) = b(y)+v*(minSinZ+maxSinZ)/2;
+	u(x) = v*(maxCosZ-minCosZ)/2; 
+	u(y) = v*(maxSinZ-minSinZ)/2;
+	u(z) = 0; % 1e-9; % d,u is determined, so zero.
 	ldi = int_create(A,b,u); 

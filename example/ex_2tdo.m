@@ -1,4 +1,4 @@
-% This is the 2D Vdp example from "Towards Formal Verification of Analog Designs".
+% This is the 2D TDO example from "Towards Formal Verification of Analog Designs".
 % NOTE: For the non-osc model, divergence on the metastable region, see simulation result. 
 % Use slicing to reduce error 
 % See ex_2tdo_cs for more accurate result by using changing variables 
@@ -118,7 +118,7 @@ function ha = ex_2tdo_ha(osc)
 function ldi = ex_2tdo_model(lp,osc) 
 	x=1;y=2;
 	bbox = lp_box(lp);
-	avgs = mean(bbox,2);  extras = diff(bbox,[],2)/2;
+	avgs = mean(bbox,2);  %extras = diff(bbox,[],2)/2;
 	x1 = 0.055; x2 = 0.35; 
 
 	% Linear terms
