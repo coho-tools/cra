@@ -25,11 +25,13 @@ function ex_3vco
 	cra_open;
 
 	% with slicing
+	disp('Computing invariant set by using two states');
 	ha = ex_3vco_ha;
 	ha = ha_reach(ha);
 	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 
   % without slicing
+	disp('Computing invariant set by using one state with smaller initial region');
 	ha_ns = ex_3vco_ha_ns;
 	ha_ns = ha_reach(ha_ns);
 	ha_reachOp(ha_ns,@(reachData)(phs_display(reachData.sets)));
