@@ -1,24 +1,24 @@
 % This is the 2D Vdp example from "Towards Formal Verification of Analog Designs".
-function [t,v] = sim_2tdo
+function [t,v] = ex_2tdo_sim
 	t0 = 0; t_end = 5e-8;
   N = 1000;
 	X0 = [rand(N,1)*0.5,rand(N,1)*1e-3];
-	figure; hold on; title('osc'); xlabel('V'); ylabel('Y');
+	figure; hold on; title('2tdo'); xlabel('V'); ylabel('Y');
 	for i=1:N
 		x0 = X0(i,:);
-    [t, v] = ode45(@(t,y)(tdo_dot(y,1)), [t0, t_end], x0); 
+    [t, v] = ode45(@(t,y)(ex_2tdo_dot(y,1)), [t0, t_end], x0); 
 	  plot(v(:,1),v(:,2));
 	end
 
 	figure; hold on; title('non-osc'); xlabel('V'); ylabel('Y');
 	for i=1:N
 		x0 = X0(i,:);
-    [t, v] = ode45(@(t,y)(tdo_dot(y,0)), [t0, t_end], x0); 
+    [t, v] = ode45(@(t,y)(ex_2tdo_dot(y,0)), [t0, t_end], x0); 
 	  plot(v(:,1),v(:,2));
 	end
  
 % NOTE: Id is not continuous due to approxed parameters 
-function Xdot= tdo_dot(X,osc) 
+function Xdot= ex_2tdo_dot(X,osc) 
 	V=1;I=2;
 	p1 = [0;0.0545;-0.9917;6.0105];
 	p2 = [8.9579e-4;0.0040;-0.0421;0.0692];

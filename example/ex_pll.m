@@ -3,17 +3,17 @@ function ex_pll
   addpath('~/cra');
   cra_open;
 
-	%disp('Working on full model');
-  %ha = ex_pll_ha;
-  %ha = ha_reach(ha);
+	disp('Working on full model');
+  ha = ex_pll_ha;
+  ha = ha_reach(ha);
 
-	%disp('Working on transformed model for zig-zag computation');
-  %ha = ex_pll_ha_zz;
-  %ha = ha_reach(ha);
+	disp('Working on transformed model for zig-zag computation');
+  ha = ex_pll_ha_zz;
+  ha = ha_reach(ha);
 
-	%disp('Working on full model with init region where theta is zero');
-  %ha = ex_pll_ha_slice;
-  %ha = ha_reach(ha);
+	disp('Working on full model with init region where theta is zero');
+  ha = ex_pll_ha_slice;
+  ha = ha_reach(ha);
 
 	disp('Working on full model to compute maximum lock time'); 
   ha = ex_pll_ha_init;
@@ -93,7 +93,7 @@ function ldi = ex_pll_model(lp,mode)
   B1 = [a;c;f];
   U1 = zeros(3,1);  
   % NOTE: trick, do not split regions for c=cmin/cmax
-  if(extras(x)<1e-2 & (bbox(x,1)<=p.cmin | bbox(x,2)>=p.cmax)) % stay there 
+  if(extras(x)<1e-2 && (bbox(x,1)<=p.cmin || bbox(x,2)>=p.cmax)) % stay there 
     B1(1) = a/2; U1(1) = abs(a/2);   
   end
 
@@ -160,7 +160,7 @@ function ha = ex_pll_ha_zz
 function ldi = ex_pll_model_zz(lp,mode)
   w=1;ph=2;
   bbox = lp_box(lp);
-  avgs = mean(bbox,2);  extras = diff(bbox,[],2)/2;
+  %avgs = mean(bbox,2);  extras = diff(bbox,[],2)/2;
   p = struct('fref', 2,  'g1', -0.01, 'g1_ph', -0.1,...
     'g2', -0.002,'cmin',0.9,'cmax',1.1,'cc',1.0, 'K',0.8,'N',1);
   v_max = p.cmax*(p.fref+bbox(w,2)); v_max = min(v_max,2.5); 
