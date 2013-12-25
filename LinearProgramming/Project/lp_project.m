@@ -1,12 +1,12 @@
 function hull = lp_project(lp,plane,tol,opt,method)
 % hull = lp_project(lp,plane,tol,opt,method)
 % This function project a high-dimensional LP (polytope) onto 
-% two demensional x-y space
+% two dimensional x-y space
 % 
 % Input:
-% 	lp: a coho lp. 'Ta2w' field is allowd. 
+% 	lp: a coho lp. 'Ta2w' field is allowed. 
 % 	plane: index of orthogonal axis plane, e.g [1,2] 
-%	tol: error tolerence (area percent)
+%	tol: error tolerance (area percent)
 % 	opt: a structure with fields (parameters for 'matlab' method);
 %		angles: initial optimization angles 
 %		niters: maximum allowed number of iterations 

@@ -22,14 +22,5 @@ FAQ:
    ./example/
    ./Projectagon/test/
 =====================
-4. What's LDI models
-   Linear differential inclusion models, i.e. 
-   xdot \in Ax+b+/-u; 
-=====================
-5. What's a projectagon 
-   It's a data structure to represent and operate high-dim objects.  
-   It represents the object by projecting it onto two-dim subspaces. 
-=====================
-6. What's the Java/Matlab threads
-   The CRA is mainly implemented in Matlab. It requires arbitrary precesion computations, which are implmented in Java. Mainly LP solvers and polygon operations. 
-
+4. More documents
+   ./doc

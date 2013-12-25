@@ -3,14 +3,13 @@ function ex_demo
   addpath('~/cra');
 	cra_open;
 
-	% with slicing
+
 	ha = ex_demo_ha;
 	ha = ha_reach(ha);
 	ha_reachOp(ha,@(reachData)(phs_display(reachData.sets)));
 
 	cra_close; 
 
-% NOTE: reduce error by slicing
 function ha = ex_demo_ha
 	% initial 
 	x = 1; y = 2; z = 3; dim = 3; planes = [x,y;x,z;y,z]; 
