@@ -1,5 +1,5 @@
-function [fwdPh,ph,opt]= ph_advance(ph,opt)
-% [fwdPh,ph,opt]= ph_advance(ph,opt)
+function [fwdPh,ph,opt,tube]= ph_advance(ph,opt)
+% [fwdPh,ph,opt,tube]= ph_advance(ph,opt)
 % This function advances a projectagon. 
 % Inputs
 %	  ph: a canonical projectagon
@@ -8,6 +8,7 @@ function [fwdPh,ph,opt]= ph_advance(ph,opt)
 %	  fwdPh: advanced projectagon
 %	  ph: the input projectagon with an extra 'fwd' fields. 
 %	  opt: the input opt with prevBloatAmt and prevTimeStep udpated.
+%   tube: reachable tube
 if(nargin<1||ph_isempty(ph))
 	error('The input projectagon is empty');
 end
@@ -106,6 +107,7 @@ for i=1:opt.riters
 end
 
 fwdPh = ph_construct(ph);
+tube  = ph_canon(ph_succ(ph,fwdPh),opt.constraintLP,opt.canonOpt);
 fwdPh = ph_canon(fwdPh,opt.constraintLP,opt.canonOpt);
 
 % update opt 

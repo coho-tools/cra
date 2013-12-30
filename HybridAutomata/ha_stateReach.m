@@ -95,12 +95,8 @@ while(~complete)
 	if(ph_isempty(ph)) 
 		error('Exception in state %s, projectagon to be advanced is empty.',name); 
 	end
-	% foward reachable sets
-	[nextPh,prevPh,fwdOpt] = ph_advanceSafe(ph,fwdOpt); % prevPh = ph+fwdInfo
-  % NOTE: nextPh are trimmed by fwdOpt.constraintLP, ph_succ(prevPh,nextPh) may be under-approximated of tube.
-	% Therefore, we reconstruct a nextPh without trimming
-  bNextPh = ph_canon(ph_construct(prevPh));
-	tube = ph_canon(ph_succ(prevPh,bNextPh),fwdOpt.constraintLP); % tube trimmed by bloated invariant for slicing
+	% foward reachable sets and tubes
+	[nextPh,prevPh,fwdOpt,tube] = ph_advanceSafe(ph,fwdOpt); % prevPh = ph+fwdInfo
 	ph = ph_canon(nextPh,inv); % ph trimmed by invariant. 
 	sets{fwdStep} = ph; tubes{fwdStep} = tube; 
 	timeSteps(fwdStep)=prevPh.fwd.timeStep; fwdT=fwdT+prevPh.fwd.timeStep; 
