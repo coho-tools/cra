@@ -97,17 +97,11 @@ while(~complete)
 	end
 	% foward reachable sets
 	[nextPh,prevPh,fwdOpt] = ph_advanceSafe(ph,fwdOpt); % prevPh = ph+fwdInfo
-	% forward reachable tubes
-  if(~isempty(nextPh))
-    tube = ph_succ(prevPh,nextPh); 
-  else
-    % NOTE: nextPh might be empty when the fwdStep size is large.
-    % We reconstruct the reachabe region without state inv constraints 
-		bNextPh = ph_canon(ph_construct(prevPh));
-		tube = ph_canon(ph_succ(prevPh,bNextPh),fwdOpt.constraintLP); 
-  end
-	% nextPh/tube trimmed by bloated invariant, ph trimmed by invariant. 
-	ph = ph_canon(nextPh,inv);
+  % NOTE: nextPh are trimmed by fwdOpt.constraintLP, ph_succ(prevPh,nextPh) may be under-approximated of tube.
+	% Therefore, we reconstruct a nextPh without trimming
+  bNextPh = ph_canon(ph_construct(prevPh));
+	tube = ph_canon(ph_succ(prevPh,bNextPh),fwdOpt.constraintLP); % tube trimmed by bloated invariant for slicing
+	ph = ph_canon(nextPh,inv); % ph trimmed by invariant. 
 	sets{fwdStep} = ph; tubes{fwdStep} = tube; 
 	timeSteps(fwdStep)=prevPh.fwd.timeStep; fwdT=fwdT+prevPh.fwd.timeStep; 
 	compT = cputime-startT;
