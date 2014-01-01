@@ -20,11 +20,8 @@ if(ph_isempty(ph) || (ph.iscanon&&isempty(lp)) )
 	return;
 end
 
-% NOTE: what if the result is empty?
-olp = lp_and(lp,ph.hullLP);
-if(~lp_feasible(olp) || all(diff(lp_box(olp),[],2)==0))
-	ph = []; return; 
-end
+% NOTE: what if the lp_and(ph.hullLP,lp) is empty or a single point?
+% Check in ph_createByLP and return []; 
 
 switch(ph.type)
 	case 0 % make poly feasible to hull	
