@@ -9,8 +9,10 @@ function ph = ph_createByLP(dim,planes,lp)
 % Output:
 % 	ph:  a projectagon with convex type, use ph_convert() to convert to other types.
 
-if(isempty(lp)||~lp_feasible(lp)) % infeasible
-	ph = []; return;
+% empty lp OR infeasible OR a single point 
+%if(isempty(lp)||~lp_feasible(lp)) % infeasible
+if(isempty(lp) || ~lp_feasible(lp) || all(diff(lp_box(lp),[],2)==0))
+	ph = []; return; 
 end
 
 ns = size(planes,1); hulls = cell(ns,1);
