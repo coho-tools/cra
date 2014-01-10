@@ -62,10 +62,10 @@ try
 
 	% Save ha file at the end
 	hfile = ha_get(ha,'hafile');
-	log_write('Writing the final hybrid automata to %s ...', hfile);
+	log_write(sprintf('Writing the final hybrid automata to %s ...', hfile));
 	save(hfile,'ha');
 
-	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins\n',name,(cputime-haT)/60));
+	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins',name,(cputime-haT)/60));
 catch ME
 	% Save the automata, which is time-consuming (I hate it). 
 	log_write('Exceptions found. Remember to save the hybrid automata to disk!!!');
