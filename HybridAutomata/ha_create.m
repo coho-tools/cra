@@ -157,5 +157,5 @@ last = 0; % no state has been computed
 ha = struct('name',name, 'states',states, 'snames',{snames}, ... % states
 		'edges',edges,  'resetMaps',{resetMaps}, ... % transitions
 		'sources',sources, 'initials',{initials}, ... % sources
-		'inv',inv, 'rpath',rpath, 'order',order, 'last',last); % other info
+		'inv',inv, 'rpath',rpath, 'order',order, 'last',last,'times',zeros(ns,1)); % other info
 
