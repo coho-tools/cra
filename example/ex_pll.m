@@ -30,7 +30,10 @@ function ha = ex_pll_ha
   inv1 = lp_create(A,b1); inv2 = lp_create(A,b2);
   phOpt.fwdOpt = ph_getOpt;
   phOpt.fwdOpt.object = 'ph'; 
-  phOpt.fwdOpt.maxBloat = 0.2; 
+  phOpt.fwdOpt.maxBloat = 0.1; 
+  %phOpt.fwdOpt.maxBloat = 0.2; 
+
+	% Failed because the time step is too large, so cmin/cmax skipped 
   callBacks.exitCond = ha_callBacks('exitCond','maxFwdStep',800); 
   callBacks.sliceCond = ha_callBacks('sliceCond','complete');
 %  callBacks.afterStep = ha_callBacks('afterStep','display');
