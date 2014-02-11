@@ -34,9 +34,9 @@ function run_dpll
              'cmin',0.9,'cmax',1.1,'cc',1.0,'vmin',2,'vmax',4, ...
              'dc', 0.01);
 
-	disp('This program is to compute circuit states of DPLL for CAV14 papers.');
-	disp('It takes around half an hour to complete the work, so please take some coffee.'); 
-	disp('There are mainly four steps to complete the proof. Plots used in the paper will be generated at the end.'); 
+  disp('This program is to compute circuit states of DPLL for CAV14 papers.');
+  disp('It takes around half an hour to complete the work, so please take some coffee.'); 
+  disp('There are mainly four steps to complete the proof. Plots used in the paper will be generated at the end.'); 
 
   % Step 1.a  
 if(1)  
@@ -88,7 +88,7 @@ if(1)
   v0mid = [p.cmin:p.dc:p.cc-p.dc, p.cmin+p.dc*8.99];
   for i=1:length(v0mid)
     v0 = (v0mid(i)+[-p.dc,p.dc])*p.fref;
-		disp(sprintf('Working on interval of v:[%d,%d].',v0(1),v0(2)));
+    disp(sprintf('Working on interval of v:[%d,%d].',v0(1),v0(2)));
     ha = dpll_ha_r2_zz(p,v0); 
     ha = ha_reach(ha);
     ha_reachOp(ha,@(reachData)(dpll_check_v1(reachData.sets))); 
@@ -102,7 +102,7 @@ if(1)
   v0mid = [p.cmin:p.dc:p.cc-p.dc, p.cmin+p.dc*8.5];
   for i=1:length(v0mid)
     v0 = (v0mid(i)+[-p.dc,p.dc])*p.fref;
-		disp(sprintf('Working on interval of v:[%d,%d].',v0(1),v0(2)));
+    disp(sprintf('Working on interval of v:[%d,%d].',v0(1),v0(2)));
     ha = dpll_ha_r2_zz_full(p,v0); 
     ha = ha_reach(ha);
     % check Mark's property
@@ -113,7 +113,7 @@ if(1)
     if(bbox(2,1)>v0(1) && bbox(2,2)>v0(2))
       disp('PASSED: lower and upper bounds of v increase');
     else
-			disp(sprintf('FAILED: The bound of v is [%d,%d] at the beginning, while is [%d,%d] at the end.',v0(1),v0(2),bbox(2,1),bbox(2,2))); 
+      disp(sprintf('FAILED: The bound of v is [%d,%d] at the beginning, while is [%d,%d] at the end.',v0(1),v0(2),bbox(2,1),bbox(2,2))); 
     end
   end
 end
