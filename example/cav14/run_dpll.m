@@ -192,7 +192,7 @@ function dpll_plot_results(N)
   end
   print -depsc dpll_zz_cv_cw.eps
   
-  figure(3); clf; hold on; xlabel('Iters'); ylabel('C'); 
+  figure(3); clf; hold on; xlabel('Iters'); ylabel('V'); 
   for i=1:length(vvlo)
     plot([i,i], [vvlo(i),vvhi(i)],'k-*');
   end
