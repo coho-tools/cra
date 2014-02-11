@@ -1,0 +1,17 @@
+This is the code used to generate result for CAV14 paper. 
+How to install Coho-Reach
+  git clone https://github.com/dreamable/cra.git 
+  cd cra
+  sh install.sh
+
+How to run the code
+  matlab 
+  run_dpll 
+
+This will take 30-60 mins. 
+
+
+TODO: 
+  1. Add constraint v/c>=fref for region entering mode 1 and v/c<=fref for mode 2. 
+  2. Use larger interval of v for step 4 to speedup computation. 
+

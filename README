@@ -1,13 +1,13 @@
-CRA: Coho Reachability Analysis Tool
+Coho-Reach: Coho Reachability Analysis Tool
 
 FAQ: 
 =====================
-1. How to install CRA
+1. How to install Coho-Reach
    sh install.sh
 =====================
-2. How to use CRA, small example
+2. How to use Coho-Reach, small example
    cra_open;
-   % Tell CRA what's the dynamics 
+   % Tell Coho-Reach what's the dynamics 
    % The function must accept a LP input and returns a LDI models
    cra_cfg('set','modelFunc' <function handle>);
    % Create the init projectagon. 

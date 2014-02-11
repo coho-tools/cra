@@ -50,24 +50,25 @@ try
 		
 		% Compute reachable region
 		[state,reachData] = ha_stateReach(state,init,inv);
-		ha.states(sid) = state; ha.last=i;
-	
+		ha.states(sid) = state; ha.last=i; ha.times(sid) = (cputime-stateT); 
+		log_write(sprintf('Computation in the %s state is completed in %d mins',state.name,(cputime-stateT)/60));
+
 		% Save state computation result 
 		sfile = ha_get(ha,'statefile',sid);
 		log_write(sprintf('Writing state reachable regions data to %s ...',sfile)); 
 		save(sfile,'reachData'); 
-
-		log_write(sprintf('Computation in the %s state is completed in %d mins',state.name,(cputime-stateT)/60));
 	end
 
 	% Save ha file at the end
 	hfile = ha_get(ha,'hafile');
-	log_write('Writing the final hybrid automata to %s ...', hfile);
+	log_write(sprintf('Writing the final hybrid automata to %s ...', hfile));
 	save(hfile,'ha');
 
-	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins\n',name,(cputime-haT)/60));
+	log_write(sprintf('Computation of hybrid automata %s is completed in %d mins',name,(cputime-haT)/60));
 catch ME
-	% Save the automata, which is time-consuming (I hate it). 
-	log_write('Exceptions found. Remember to save the hybrid automata to disk!!!');
+	% Save the automata, which is time-consuming.
+	hfile = ha_get(ha,'hafile');
+	log_write(sprintf('Exception found! The automata is saved in %s', hfile));
+	save(hfile,'ha');
 	rethrow(ME); 
 end
