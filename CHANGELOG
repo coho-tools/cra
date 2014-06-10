@@ -1,0 +1,6 @@
+2012-06-10: Fixed the random result bug. 
+  Jijie reported that the result from Coho-Reach is kind of random. 
+  The problem was caused by the compareTo function in the ReduceEvent class, which uses hasCode to compare. 
+  Therefore, the compare result depends on hasCode which is random from different Java runs. 
+  I made such stupid mistake was because I was not familiar with Java at that time and thought the remove function from PriorityQueue is based on the compareTo function, instead of the object reference. 
+  With this bug fix, I have change the version to 1.0.1. 
