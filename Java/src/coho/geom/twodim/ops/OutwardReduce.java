@@ -65,7 +65,12 @@ import coho.common.number.*;
  * Therefore, I added a notConvexPolygon variable. If it is not true, we don't need to update point. See constructor, reduceEdge.
  */
 /*
- * 
+ *2014-06-06
+ *NOTE: This is not true. The remove function is based on the object reference, not compareTo function. 
+ *So don't need to complicate the compareTo function for deleting correct objects. 
+ *In fact, the hasCode() will make the result random. 
+ *I made this stupid mistake long time ago as I was not very familiar with Java at that time. 
+ *
  *NOTE: Remove reduceEvent from costQueue. See ReduceEvent
  *
  *It seem that the remove() function of PriorityQueue is based on compareTo not equals
@@ -142,6 +147,9 @@ public class OutwardReduce{
 		}
 		public int compareTo(ReduceEvent event){
 			int result = (int)Math.signum(cost() - event.cost());
+			return result;
+			// NOTE: The following code make the result random
+		  /*
 			if(result!=0)
 				return result;
 			else if(this.equals(event))
@@ -155,6 +163,7 @@ public class OutwardReduce{
 					throw new RuntimeException("ReduceEvent.compareTo. It's impossible. The hashCode for different object are the same.");
 				return result;
 			}
+			*/
 		}
 		public String toString(){
 			return "increase area by: "+area+" the cost is "+cost;
