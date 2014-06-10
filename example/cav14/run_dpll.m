@@ -500,7 +500,10 @@ function ldi = dpll_model(lp,p,mode)
   U2 = [0;0;abs(err(1))];
 
   A = A1+d*A2; B = B1+d*B2; U = U1+d*U2; 
+	% Add quantitization error 
+	%U = U+[1/1280;3/1024;1e-3];
   ldi = int_create(A,B,U);
+
 
 
 %% DPLL model for zig-zag mode (v/c close to fref). Check Mark's documents (example2.pdf & strategy.pdf) for details. 
