@@ -1,0 +1,62 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inveter models
+
+ODE models
+  We use  
+    \dot{Vo} = -T*(Vsat*tanh(Vi/Vs) + Vo);
+  to model an inveter circuit for the inveter-ring oscillator (also for rambus-ring oscillator).
+  
+  Parameters: 
+    T is a constant (usually doesn't matter).
+    Vsat is the max value of V. We set Vsat as one, so the IRO oscillates in the range of [-1,1].  
+    Vs is the input load. When it is small, IRO oscillates faster, and the orbit is close to rectangle. 
+    When Vs is large, it oscillates slower, or doesn't oscillate at all. The orbit shape is like cycle. 
+    Vsat decide the magnitude, Vsat/Vs decides the shape, >1.5 to make IRO oscillates.
+    For N = 3, the magnitude of orbit is not Vsat, only Vsat/2, why? 
+
+LDI models
+  The IRO models is:
+    Xl = Eprev * X; Eprev(i,i-1)=1;
+    \dot(X)= -T*(X+Vsat*tanh(Xl/Vs) 
+           = -T*X -T*Vsat*tanh(Xl/Vs)
+           = -T*X -T*Vsat*Eprev*tanh(X/Vs)
+  
+  So need to linearize:
+    f(x)   = tanh(x) 
+           = tanh(x0) + sechx0^2 *dx +/- err 
+           = sechx0^2 * x + tanh(x0) - sechx0^2*x0 +/- err
+    dx \in [-C,C]
+    err    = tanh(x) - tanh(x0) - sech(x0)^2*dx 
+           = (tanh(x0)+tanh(dx))/(1+tanh(x0)*tanh(dx))-tanh(x0) - sech(x0)^2*dx
+           = tanh(dx)*(1-tanh(x0)^2)/(1+tanh(x0)*tanh(dx)) - sech(x0)^2*dx
+           = tanh(dx)*sech(x0)^2/(1+tanh(x0)*tanh(dx)) - sech(x0)^2*dx
+           = sech(x0)^2* (tanh(dx)/(1+tanh(x0)*tanh(dx)) - dx)
+  
+  Now compute the min/max value of err
+    let a  = tanh(x0)
+    g(x)   = tanh(x)/(1+a*tanh(x)) -x
+           = 1/a - 1/(a*(1+a*tanh(x))) - x 
+    let dg(x) = 0, get 
+         x = atanh(-2*a/(1+a^2))
+  So the max value of 'err' could be on x = [-C,C,atanh(-2*a/(1+a^2))] 
+      (last point only if in range) 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Simulation
+run_iro_simu.m
+
+IRO period with # of stage(Vsat/Vs=1/0.25):  ~3.x/2*N 
+  N = 3: P = 3.5;
+  N = 5: P = 7;
+  N = 7: P = 10;
+  N = 9: P = 13.5;
+  N = 11: P = 16
+  N = 13: P = 18.5
+  N = 15: P = 22 
+  N = 21: P = 31 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reachabilities
+run_iro_orbit: computes the oscillation orbit
+run_iro_perf:  used to measure the performance of CRA
+plot_iro_perf: plot the performance data
