@@ -1,0 +1,38 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inveter models
+
+ODE models
+  We use  
+    \dot{Vo} = -T*(Vsat*tanh(Vi/Vs) + Vo);
+  to model an inveter circuit for the RRO, it's the same with the inveter-ring oscillator. 
+
+LDI models
+  How to linearize tanh function 
+    f(x)   = tanh(x) 
+           = tanh(x0) + sechx0^2 *dx +/- err 
+           = sechx0^2 * x + tanh(x0) - sechx0^2*x0 +/- err
+    dx \in [-C,C]
+    err    = tanh(x) - tanh(x0) - sech(x0)^2*dx 
+           = (tanh(x0)+tanh(dx))/(1+tanh(x0)*tanh(dx))-tanh(x0) - sech(x0)^2*dx
+           = tanh(dx)*(1-tanh(x0)^2)/(1+tanh(x0)*tanh(dx)) - sech(x0)^2*dx
+           = tanh(dx)*sech(x0)^2/(1+tanh(x0)*tanh(dx)) - sech(x0)^2*dx
+           = sech(x0)^2* (tanh(dx)/(1+tanh(x0)*tanh(dx)) - dx)
+  
+  Now compute the min/max value of err
+    let a  = tanh(x0)
+    g(x)   = tanh(x)/(1+a*tanh(x)) -x
+           = 1/a - 1/(a*(1+a*tanh(x))) - x 
+    let dg(x) = 0, get 
+         x = atanh(-2*a/(1+a^2))
+  So the max value of 'err' could be on x = [-C,C,atanh(-2*a/(1+a^2))] 
+      (last point only if in range) 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Simulation
+run_rro_simu.m
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reachabilities
+run_rro_orbit: computes the oscillation orbit
+run_rro_perf:  used to measure the performance of CRA
+plot_rro_perf: plot the performance data

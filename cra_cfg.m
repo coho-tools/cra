@@ -15,8 +15,6 @@
 %                 Given a LP, return a LDI model or a cell of models. 
 %                 See int_create for LDI model.
 %       default:  @model_create
-%     tol: tolerence (not used now)
-%       default: 1e-6
 %     dataPath: path to save computation data
 %       default: /var/tmp/<user>/coho/cra/data/
 %     phOpt: opt for projectagon package. See ph_getOpt for detail.
@@ -36,6 +34,8 @@
 %     javaFormat: Format of numbers passed between Java and Matlab threads
 %       values:  'hex', 'dec'
 %       default: 'hex'
+%     tol: tolerence (not used now)
+%       default: 1e-6
 
 
 function [val,status] = cra_cfg(op,varargin)
