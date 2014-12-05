@@ -1,5 +1,5 @@
 % This function creates a hybrid automata for a N-stage inveter-ring oscillator circuits. 
-% N must be odd number. 
+% N must be an odd number. 
 function ha = iro_ha(varargin)
   opt = struct('N',3,'fwdOpt',ph_getOpt,'callBacks',[], ...
                'type','convex', 'haName',[],'rpath','.'); 
@@ -14,7 +14,7 @@ function ha = iro_ha(varargin)
   % states
   phOpt.fwdOpt = fwdOpt;
   callBacks.sliceCond = ha_callBacks('sliceCond','never');  % do not need slice
-  states(1) = ha_state('s1',@(lp)(iro_model_wrapper(lp)),[],phOpt,callBacks); 
+  states(1) = ha_state('s1',@(lp)(iro_ldi(lp)),[],phOpt,callBacks); 
   source = 's1'; % source
 
   % initial, HLHL...HLH
@@ -29,7 +29,7 @@ function ha = iro_ha(varargin)
 end
 
 % linear differential equation
-function ldi = iro_model_wrapper(lp)
+function ldi = iro_ldi(lp)
   bbox = lp_box(lp);
   [A,b,u] = iro_model(bbox); 
   ldi  = int_create(A,b,u);

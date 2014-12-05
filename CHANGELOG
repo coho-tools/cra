@@ -1,4 +1,5 @@
-2012-06-10: Fixed the random result bug. 
+Version 1.0: initial release to public
+Version 1.1: (2014-06-10) Fixed the random result bug. 
   Jijie reported that the result from Coho-Reach is kind of random. 
   The problem was caused by the compareTo function in the ReduceEvent class, which uses hasCode to compare. 
   Therefore, the compare result depends on hasCode which is random from different Java runs. 
