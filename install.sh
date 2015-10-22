@@ -111,7 +111,7 @@ function  info = cra_info_init
   java_classpath = [cra_home,'/Java/lib/cup.jar',':',cra_home,'/Java/bin/coho.jar'];
   fork_bin = [cra_home,'/JavaInterface/Fork/fork'];
 
-  version = 1.0.1;
+  version = 1.1;
   license = 'bsd';
   
   info = struct('version',version, 'license',license, ...
