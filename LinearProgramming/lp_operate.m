@@ -10,7 +10,6 @@ function lp = lp_operate(lp, operation, operand)
 %     	'ALeftMult' : lp.A = operand * lp.A
 %     	'ARightMult': lp.A = lp.A * operand
 %     	'AAdd'      : lp.A = lp.A + operand
-%   operation can also be the same operators for beq and Aeq respectively
 %
 % Output: the modified lp
 %
@@ -24,19 +23,10 @@ switch lower(operation)
     lp.A = lp.A * operand;
   case 'aadd'
     lp.A = lp.A + operand;
-
   case 'badd'
     lp.b = lp.b + operand;
   case 'bmult'
     lp.b = operand * lp.b;
-
-  case 'aeqleftmult'
-    lp.Aeq = operand * lp.Aeq;
-  case 'aeqrightmult'
-    lp.Aeq = lp.Aeq * operand;
-  case 'aeqadd'
-    lp.Aeq = lp.Aeq + operand;
-
   case 'beqadd'
     lp.beq = lp.beq + operand;
   case 'beqmult'

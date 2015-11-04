@@ -15,8 +15,6 @@ switch(lower(type))
 case {'general','lp'}
 	A = rand(siz(1),dim); 
 	b = rand(siz(1),1);
-	Aeq = rand(siz(2),dim);
-	beq = rand(siz(2),1);
 case 'coho'
 	A = zeros(siz(1),dim);
 	b = rand(siz(1),1);
@@ -24,13 +22,10 @@ case 'coho'
 		pos = round(rand(1,2)*(dim-1))+1; % random place
 		A(i,pos) = rand(1,2);
 	end
-	Aeq = zeros(0,dim); beq = zeros(0,1);
 otherwise
 	error('do not support');
 end
 
 A = A.*sign(rand(size(A))-0.5); % sign
 b = b.*sign(rand(size(b))-0.5); 
-Aeq = Aeq.*sign(rand(size(Aeq))-0.5); 
-beq = beq.*sign(rand(size(beq))-0.5); 
-lp = lp_create(A,b,Aeq,beq,false);
+lp = lp_create(A,b);

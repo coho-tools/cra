@@ -10,26 +10,19 @@ function lp = lp_dims(lp,op,index,n)
 % 		lpf = lp_dims(lpr,'augment',[4,1],4); % lpf.A = [0,0,0,1]
 
 switch(lower(op)) 
-	case {'project','redue'} 
+	case {'project','reduce'} 
 		dim = size(lp.A,2);
 		if(length(index)>dim||any(index>dim)||any(index<=0))
 			error('input incorrect');
 		end
 		lp.A = lp.A(:,index); 
-		lp.Aeq = lp.Aeq(:,index); 
-		if(lp.isnorm)
-			lp = lp_norm(lp);
-		end
 	case {'augment',increase'} 
 		dim = size(lp.A,2);
 		if(n<dim||length(index)~=dim||any(index>n)||any(index<=0))
 			error('input incorrect');
 		end
 		A = zeros(size(lp.A,1),n);
-		Aeq = zeros(size(lp.Aeq,1),n);
-		A(:,index) = lp.A;
-		Aeq(:,index) = lp.Aeq;
-		lp.A = A; lp.Aeq = Aeq;
+		A(:,index) = lp.A; lp.A = A; 
 	otherwise
 		error('do not support operation'); 
 end

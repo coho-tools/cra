@@ -6,7 +6,6 @@ function fwdLP = int_forward(lp,ldi,t,method)
 % The reachable space at time t is LP: 
 % 	PEx <= q + P(I-E)A^(-1)b 
 %   E = e^(-At)
-% 
 % When the model has an uncertain input as:
 % 	xdot = Ax+b+/-u 
 % The new LP is :
@@ -14,18 +13,31 @@ function fwdLP = int_forward(lp,ldi,t,method)
 % 	ints(i) = \int_0^{t} n'*e^(-As)u*(s) ds
 %   u*(t) = sign(e^(-A't)*n)*u;
 %   n = P(i,:)'
+% 
+% For advanced LP: P*Eo*x<= q, let PP = P*Eo
+% The new LP is 
+%   PPEx <= q + PP(I-E)A^(-1)b + ints(PP)
+%   P*Eo*E*x <= q + PP(I-E)*A^(-1)*b + ints(PP)
+%    
 
 	if(nargin<4||isempty(method))
 		method = 'default';
 	end;
 	
-	% assert(isempty(lp.Aeq))
 	P = lp.A;  q = lp.b;
 	A = ldi.A; b = ldi.b; u = ldi.u;
 	[nc,dim] = size(P);
+
+  if(~isempty(lp.bwd))
+    Eo = lp.bwd; invEo = lp.fwd
+    PP = P*Eo
+  else 
+    Eo = eye(dim); invEo = eye(dim);
+    PP = P;
+  end
 	
 	% 1. compute E
-	E = expm(-A*t);
+	E = expm(-A*t); invE = expm(A*t);
 	% 2. compute  (I-E)*A^{-1}
 	mc = int_inv(A,0,t);
 	% 3. compute ints 
@@ -33,13 +45,13 @@ function fwdLP = int_forward(lp,ldi,t,method)
 		% assume the optimal point does not change,
 		% most of times, the sign does not change.  
 		case {'default'}  % use constant u, max of all possible vaules.
-			ints = abs(P*mc)*u; 
+			ints = abs(PP*mc)*u; 
 		case {'under'}  % under-approximation
-			ints = abs(P*mc*u); 
+			ints = abs(PP*mc*u); 
 		case {'init','fix'} % use optimal point of at a particular time
-			%s = sign(P); 
-			s = sign(expm(-A'*t/2)*P')'; 
-			ints = (P*mc.*s*u); 
+			%s = sign(PP); 
+			s = sign(expm(-A'*t/2)*PP')'; 
+			ints = (PP*mc.*s*u); 
 			ints = ints+10*eps; % for round-off error
 			% NOTE, ints should always be positive. 
 			% However, this method may give negative results. see test/bug1
@@ -51,14 +63,14 @@ function fwdLP = int_forward(lp,ldi,t,method)
 			int = 0;
 			midT = (ts(1:end-1)+ts(2:end))/2; 
 			for i=1:N
-				s = sign(P*expm(-A*midT(i))); 
-				int = int+((P*int_inv(A,ts(i),ts(i+1))).*s); 
+				s = sign(PP*expm(-A*midT(i))); 
+				int = int+((PP*int_inv(A,ts(i),ts(i+1))).*s); 
 			end 
 			ints = int*u;
 		case {'exact'} % "exact" solution 
 			ints = zeros(nc,1); 
 			for i=1:nc % for each face 
-				n = P(i,:)'; % normal of face 
+				n = PP(i,:)'; % normal of face 
 	
 				% find critical time, 5 order is enough 
 				c = [(-A)^5*n/120,(-A)^4*n/24,(-A)^3*n/6,(-A)^2*n/2,(-A)*n,n]; 
@@ -84,9 +96,9 @@ function fwdLP = int_forward(lp,ldi,t,method)
 			error('do not support');
 	end
 	
-	q = q + P*mc*b+ints;
+	q = q + PP*mc*b+ints;
 	fwdLP = lp_create(P,q);
-	fwdLP.Ta2w = E;
+	fwdLP.bwd = Eo*E; fwdLP.fwd = invEo*invE;
 end
 
 function v = int_inv(A,t0,t1)

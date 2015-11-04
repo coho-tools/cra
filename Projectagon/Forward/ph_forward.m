@@ -57,7 +57,7 @@ function poly = lps_project(lps,plane,tol,ndir)
 	nlp = length(lps); ps = cell(nlp,1);
 	for i=1:nlp
 		lp = lps{i}; 
-		ndir = lp.Ta2w*ndir; ndir = ndir(plane,:);
+		ndir = lp.bwd*ndir; ndir = ndir(plane,:);
 		opt.angles = atan2(ndir(2,:),ndir(1,:))';
 		ps{i} = lp_project(lp,plane,tol,opt);
 		if(isempty(ps{i}))

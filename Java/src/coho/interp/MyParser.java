@@ -73,7 +73,7 @@ class MyParser {
 			in = new PromptingReader(System.in);
 		else 
 			in = new PromptingReader(new CopyingReader(System.in, logfile));
-		BlockingQueue<PTeval> q = new LinkedBlockingQueue<PTeval>(256);
+		BlockingQueue<PTeval> q = new LinkedBlockingQueue<PTeval>(2560);
 		ParserThread pThread = new ParserThread(in, pf, q, null);
 		BasicFunctions.setParser((Parse)pThread);		
 		EvalThread eThread = new EvalThread(q);

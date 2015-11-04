@@ -17,7 +17,4 @@ iss = true(1,n);
 if(~isempty(lp.A))
 	iss = iss & all(lp.A*pts <= repmat(lp.b,1,n),1);
 end
-if(~isempty(lp.Aeq))
-	iss = iss & all(abs(lp.Aeq*pts-repmat(lp.beq,1,n))<eps,1);
-end
 

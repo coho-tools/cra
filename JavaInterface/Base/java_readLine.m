@@ -1,7 +1,9 @@
 function line = java_readLine
 % line = java_readLine
 % This function read the next non-comment line
-fid = cra_cfg('get','javaOut');
+javaOut = cra_cfg('get','javaOut');
+idx = cra_cfg('get','currThread');
+fid = javaOut(idx);
 while 1
     line = fgetl(fid);
 	if(~ischar(line))% EOF

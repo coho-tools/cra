@@ -17,8 +17,10 @@ n = size(lp.A,2);
 
 % send LP to java process
 A = -lp.A; b = -lp.b; % Java side uses Ax >= b
-Aeq = lp.Aeq; beq = lp.beq;
+Aeq = zeros(0,n); beq = zeros(0,1);
 pos = zeros(n,1);
+bwd = lp.bwd; fwd = lp.fwd;
+
 java_writeComment('BEGIN lp_project'); % comment in matlab2java
 java_writeLabel; % comment in java2matlab
 java_writeMatrix(A,'A'); % Ax >= b 
@@ -26,11 +28,10 @@ java_writeMatrix(b,'b');
 java_writeMatrix(Aeq,'Aeq'); % Aeq x = beq
 java_writeMatrix(beq,'beq');
 java_writeBoolMatrix(pos,'pos'); % x[pos] >= 0?
-if (isfield(lp, 'Ta2w'))
-	Ta2w = lp.Ta2w; Tw2a = inv(Ta2w);
-	java_writeMatrix(Ta2w,'Ta2w'); % bwdT
-	java_writeMatrix(Tw2a,'Tw2a'); % fwdT 
-	java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,Tw2a,Ta2w);'); 
+if(~isempty(lp.bwd))
+	java_writeMatrix(bwd,'bwd'); % bwdT
+	java_writeMatrix(fwd,'fwd'); % fwdT 
+	java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,bwd,fwd);'); 
 else
 	java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos);'); 
 end

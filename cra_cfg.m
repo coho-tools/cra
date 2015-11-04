@@ -34,6 +34,9 @@
 %     javaFormat: Format of numbers passed between Java and Matlab threads
 %       values:  'hex', 'dec'
 %       default: 'hex'
+%     javaThreads: Number of java processes
+%       value:    positive number
+%       default:  1
 %     tol: tolerence (not used now)
 %       default: 1e-6
 
@@ -82,12 +85,13 @@ function cfg = cra_cfg_default
 	% tolerence. 
 	tol = 1e-6;
 	javaFormat = 'hex';
+  javaThreads = 2;
 
   cfg = struct('lpSolver', lpSolver, 'projSolver', projSolver, ...
 	             'polySolver', polySolver, 'polyApproxEn', polyApproxEn, ...
 		           'phOpt', phOpt, 'modelFunc', modelFunc, ...
 	 						 'dataPath', dataPath, 'threadPath', threadPath, ...
-	             'tol', tol, 'javaFormat', javaFormat); 
+	             'tol', tol, 'javaFormat', javaFormat, 'javaThreads', javaThreads); 
 end % cra_cfg_default;
 
 

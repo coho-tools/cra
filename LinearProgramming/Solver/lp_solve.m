@@ -24,16 +24,12 @@ end
 switch(lower(solver)) 
 	case 'java'
 		assert(lp_iscoho(lp));
-		if(isfield(lp,'Ta2w')) 
-			[v,x,status] = java_lpSolve(f,lp.A,lp.b,lp.Aeq,lp.beq,lp.Ta2w);	
-		else 
-			[v,x,status] = java_lpSolve(f,lp.A,lp.b,lp.Aeq,lp.beq);	
-		end
+    [v,x,status] = java_lpSolve(f,lp);
 	case 'cplex'  % require cplex liences
-		A = [lp.A;lp.Aeq]; b = [lp.b;lp.beq];
-		if(isfield(lp,'Ta2w'))
-			A = A*lp.Ta2w; 
-		end
+		A = lp.A; b = lp.b; 
+    if(~isempty(lp.bwd)) 
+      A = A*lp.bwd; 
+    end
 		IndEq = length(lp.b)+1:length(b);
 		[v,x,status] = cplex_lp([],f,A,b,IndEq);
 		%0: error before getting the result
@@ -45,7 +41,7 @@ switch(lower(solver))
 			status = 4;
 		end
 	case {'matlab','linprog'}
-		[x,v,status] = linprog(f,lp.A,lp.b,lp.Aeq,lp.beq);
+		[x,v,status] = linprog(f,lp.A,lp.b); 
 		map = [4,NaN,2,4,1,2,NaN,4,0]; %
 		% 1 Function converged to a solution x.
 		% 0 Number of iterations exceeded options.MaxIter.

@@ -1,0 +1,47 @@
+% Using CRA on the helicopter demo
+function test 
+  heli
+end
+
+function heli
+  cra_open(true);
+
+  dim = 28;
+  coords = (1:dim)'; 
+  planes = [coords coords+1];
+  planes(dim,2) = 1;
+  
+  bbox = [zeros(dim, 1) 0.1*ones(dim,1)];
+	lp = lp_createByBox(bbox);
+  m = heli_model();
+ 
+  T = 30;
+  fwdT = 0; fwdStep = 1; lps= {}; 
+  lps{fwdStep} = lp; 
+  tic 
+  for fwdT=0.1:0.1:T
+    fwdStep=fwdStep+1;
+    lps{fwdStep} = int_forward(lp,m,fwdT);
+  end
+  toc
+
+  hulls = cell(length(lps),dim);
+  tic
+  for j=1:dim
+  %for j=2
+    fprintf('working on the %i-th plane\n',j);
+	  plane = planes(j,:);
+		m = eye(dim); 
+		x = m(:,plane(1)); y = m(:,plane(2));
+    for k = 1:length(lps)
+      hs{k,1} = lp_projectBoxLP(lps{k},x,y);
+    end
+    hulls(:,j) = hs;
+  end
+  toc
+
+  save('data','lps','hulls');
+ 
+  cra_close; 
+end
+

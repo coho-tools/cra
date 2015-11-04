@@ -19,4 +19,4 @@ A = zeros(m,dim);
 A(sub2ind([m,dim],1:m,index)) = -1;
 A = [A;-A];
 b = [-bbox(:,1); bbox(:,2)];
-lp = lp_create(A,b,[],[],true);
+lp = lp_create(A,b);

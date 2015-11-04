@@ -4,8 +4,6 @@ function bloatLP = lp_bloat(lp, bloatAmt,includeBox)
 %  Each point in the feasible region of lp can move by bloatAmt. 
 %  bloatLP is feasible region that contains all such points.
 % 
-%  lp: A standard normalized lp is required. otherwise, lp_convert and 
-%      lp_norm will be called. 
 %  bloatAmt: 1) a scalar, bloat same on each direction
 %            2) a vector, decrease and increase bloat amount are the same
 %            3) nx2 matrix: bloatAmt(i,1) is the decrease bloat amount on direction i
@@ -23,12 +21,7 @@ if(lp_isempty(lp))
 	bloatLP = []; return;
 end
 
-if(~isempty(lp.Aeq))
-    lp = lp_convert(lp);
-end;
-if (~lp.isnorm)
-    lp = lp_norm(lp);
-end;
+lp = lp_norm(lp);
 
 % process bloatAmt; 
 dim = size(lp.A,2);
@@ -60,4 +53,4 @@ A1 = zeros(size(lp.A)); A2=A1; % A1 is the index of dxl dyl and A2 for dxr dyr
 index = lp.A<0; A1(index) = -lp.A(index);
 index = lp.A>0; A2(index) =  lp.A(index);
 b = [A1,A2]*bloatAmt;
-bloatLP = lp_create(lp.A, lp.b + b, [], [], true);
+bloatLP = lp_create(lp.A, lp.b + b);

@@ -10,4 +10,4 @@ if(lp_isempty(lp))
 end
 
 c = sum(lp.A~=0,2);
-iscoho = isempty(lp.Aeq) & all( c==1 | c==2 );
+iscoho = all( c==1 | c==2 );

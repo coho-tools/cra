@@ -5,3 +5,7 @@ Version 1.1: (2014-06-10) Fixed the random result bug.
   Therefore, the compare result depends on hasCode which is random from different Java runs. 
   I made such stupid mistake was because I was not familiar with Java at that time and thought the remove function from PriorityQueue is based on the compareTo function, instead of the object reference. 
   With this bug fix, I have change the version to 1.0.1. 
+
+FRCA: 
+  % TODO: rename Ta2w/Tw2a to bwd/fwd, must have in LP, remove Aeq/beq
+  remove all functions/features unless necessary

@@ -4,7 +4,7 @@ function hull = lp_project(lp,plane,tol,opt,method)
 % two dimensional x-y space
 % 
 % Input:
-% 	lp: a coho lp. 'Ta2w' field is allowed. 
+% 	lp: a coho lp. 'bwd' field is allowed. 
 % 	plane: index of orthogonal axis plane, e.g [1,2] 
 %	tol: error tolerance (area percent)
 % 	opt: a structure with fields (parameters for 'matlab' method);
@@ -36,9 +36,6 @@ if(tol<=eps)
 end
 if(lp_isempty(lp))
 	error('empty lp');
-end
-if(~isempty(lp.Aeq)) 
-	lp = lp_convert; 
 end
 
 switch(lower(method))
