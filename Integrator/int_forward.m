@@ -29,8 +29,8 @@ function fwdLP = int_forward(lp,ldi,t,method)
 	[nc,dim] = size(P);
 
   if(~isempty(lp.bwd))
-    Eo = lp.bwd; invEo = lp.fwd
-    PP = P*Eo
+    Eo = lp.bwd; invEo = lp.fwd;
+    PP = P*Eo;
   else 
     Eo = eye(dim); invEo = eye(dim);
     PP = P;

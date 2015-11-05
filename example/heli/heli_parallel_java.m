@@ -37,7 +37,7 @@ function heli
 	  plane = planes(j,:);
 		m = eye(dim); 
 		x = m(:,plane(1)); y = m(:,plane(2));
-    hs = java_lpsProject(lps,x,y,0.01);
+    hs = java_lpsProject(lps,x,y,0.0);
     hulls(:,j) = hs;
   end
   toc

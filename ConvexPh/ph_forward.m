@@ -7,4 +7,6 @@ function phs = ph_forward(ph,ldi,tps)
     bbox = []; bboxLP = []; status = 1; % unprojected
     phs{i} = ph_create(ph.dim, ph.planes, hulls, hullLP, bbox, bboxLP, ph.type, status) ;
   end
+
+  phs = phs_project(phs);
 end

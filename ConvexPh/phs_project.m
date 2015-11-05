@@ -22,7 +22,7 @@ function phs = phs_project(phs)
 
   for i=1:length(phs)
     ph = phs{i}; 
-    ph.hulls = hulls(i,:); 
+    ph = ph_projUpdate(ph,hulls(i,:)); 
     phs{i} = ph;
   end
 end

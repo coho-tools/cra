@@ -42,6 +42,7 @@ function java_lpsProject_dispatch(lp, x, y,tol)
   
   % send LP to java process
   A = -lp.A; b = -lp.b; % Java side uses Ax >= b
+  bwd = lp.bwd; fwd = lp.fwd;
   Aeq = zeros(0,n); beq = zeros(0,1);
   pos = zeros(n,1);
   java_writeComment('BEGIN lp_project'); % comment in matlab2java
@@ -51,10 +52,10 @@ function java_lpsProject_dispatch(lp, x, y,tol)
   java_writeMatrix(Aeq,'Aeq'); % Aeq x = beq
   java_writeMatrix(beq,'beq');
   java_writeBoolMatrix(pos,'pos'); % x[pos] >= 0?
-  if(~isempty(lp.bwd))
+  if(~isempty(bwd))
 	  java_writeMatrix(bwd,'bwd'); % bwdT
 	  java_writeMatrix(fwd,'fwd'); % fwdT 
-	  java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,bwd,fwd);'); 
+	  java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,fwd,bwd);'); 
   else
   	java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos);'); 
   end
