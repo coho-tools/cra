@@ -1,7 +1,8 @@
 function test_int
   disp('**** This file tests the LDI models ****');
   disp('** Test to forward a convex polygon by a LDI model **');
-	test_demo
+	%test_demo
+  test_contain
 	
 function test_demo
   disp('  Create a random LDI model.');
@@ -20,3 +21,18 @@ function test_demo
 	poly_display(hull);
 	poly_display(fwdHull,'r');
 
+function test_contain
+  A = 1; b = 1; u = 0.1; L = -1; H = 1;
+  ldi1 = int_create(A,b,u); 
+  isc = int_contain(ldi1,ldi1,L,H);
+  assert(isc)
+  ldi2 = ldi1;
+  ldi2.u = 0.11;
+  isc = int_contain(ldi1,ldi2,L,H); 
+  assert(~isc)
+  ldi2.A = 0.9; ld2.u = 0.09; 
+  isc = int_contain(ldi1,ldi2,L,H);
+  assert(~isc);
+  ldi2.u = 0;
+  isc = int_contain(ldi1,ldi2,L,H);
+  assert(isc)

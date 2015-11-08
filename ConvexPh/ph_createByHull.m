@@ -8,7 +8,7 @@ assert(ns>=dim);
 
 % compute hullLP
 m = eye(dim); 
-hullLP = lp_create(zeros(0,dim), [],[],[],1);
+hullLP = lp_create(zeros(0,dim), []); 
 for i=1:ns
 	dims = m(:,planes(i,:));
 	hullLP = lp_and(hullLP,lp_createByHull(hulls{i},dims));

@@ -20,6 +20,7 @@ function fwdLP = int_forward(lp,ldi,t,method)
 %   P*Eo*E*x <= q + PP(I-E)*A^(-1)*b + ints(PP)
 %    
 
+
 	if(nargin<4||isempty(method))
 		method = 'default';
 	end;

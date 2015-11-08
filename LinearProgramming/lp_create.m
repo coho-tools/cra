@@ -20,5 +20,5 @@ if(nargin < 3)
   bwd = []; fwd = []; 
 end
 
-assert(~isempty(A) & ~isempty(b))
+%assert(~isempty(A) & ~isempty(b))
 lp = struct('A',A,'b',b,'bwd',bwd,'fwd',fwd); 

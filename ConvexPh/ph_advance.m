@@ -1,12 +1,12 @@
-function PHS = ph_advance(ph,model,model2,opt)
+function PHS = ph_advance(ph,model,opt,isCRA)
   tend = opt.tend; 
-  tstep = opt.tstep; 
-  tspace = opt.tspace;
-  assert(tend>tstep && tstep>tspace);
+  tstepL = opt.tstepL; 
+  tstepS = opt.tstepS;
+  assert(tend>tstepL && tstepL>=tstepS);
   maxu = opt.maxu; 
 
   tcurr = 0; 
-  dt = tstep;
+  dt = tstepL;
   
   PHS = cell(0,1);
   while(tcurr<tend)
@@ -14,58 +14,33 @@ function PHS = ph_advance(ph,model,model2,opt)
 
     % compute reachable regions in [tcurr,tnext]
     ldi = model(ph.bbox);
-    %A = ldi.A; b = ldi.b; u = ldi.u; 
-    assert(all(ldi.u<maxu)); % otherwise, no way to move forward
 
     % predict a region bbox that has model error < maxU
-    N = ceil(dt/tspace)+1;
+    N = ceil(dt/tstepS)+1;
     tps = linspace(0,dt,N); 
+    tps = tps(2:end);
 
-    %ldi = int_create(A,b,maxu);
-    %ldi = int_create(A,b,u);
     phs = ph_forward(ph, ldi, tps);
-
-    miss = true; 
-    while(miss)
-      bbox = phs_box(phs(1:N));
-      ldi = model(bbox); 
-      % TODO: better algorithm, find the largest one ?
-      if(any(ldi.u>=maxu))
-        assert(N>2);
-        N = ceil(N/2);
-        tps = tps(1:N); 
-      else
-        miss = false; 
-      end
-    end
-
-    % refine models with real error
-    %ldi = int_create(A,b,u);
-
-    % continue computation till outside bbox
-    gofurther = true; 
-    while(gofurther)
-      phs = ph_forward(ph,ldi,tps); 
-      isc = phs_inBox(phs,bbox);
-      if(all(isc))
-        % increase time
-        tps = [tps,tps(end)+tps];
-      else
-        gofurther = false;
-        % find the last one in the region
-        idx = find(~isc,1)-1;  
-        assert(idx>1) 
-        tps = tps(1:idx); 
-      end
-    end
 
     N = length(tps);
     PHS(end+1:end+N)  = phs(1:N); 
     ph = phs{N}; % initial ph for next step
-    dt = tps(end);
+    % NOTE: the condition number can't be too large 
+    cond(ph.hullLP.bwd)
+    if(isCRA)
+      ph = ph_createByHull(ph.dim, ph.planes, ph.hulls);
+    end
+%    if(cond(ph.hullLP.bwd)>1.2)
+%      num = ph_boxNum(ph);
+%      if(0&&max(num)<1.2)
+%        disp('projecting to bbox')
+%        ph = ph_createByBox(ph.bbox,ph.planes); 
+%      else
+%        disp('projecting to hull')
+%        ph = ph_createByHull(ph.dim, ph.planes, ph.hulls);
+%      end
+%    end
     tcurr = tcurr+dt;
-    dt = dt*2;
-    tcurr
-    % TODO: predict next dt based history
+    %tcurr
   end
 

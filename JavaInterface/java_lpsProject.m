@@ -21,7 +21,7 @@ function hulls = java_lpsProject(lps,xs,ys,tols)
       lp = lps{i}; 
       x = xs{i}; y = ys{i}; tol = tols(i);
       curr = mod(i,jNum); curr = curr+jNum*(curr==0);
-      fprintf('dispatch %i-th job with TC = %i to the %i-th thread\n',i,cra_cfg('get','javaTC')+1,curr)
+      %fprintf('dispatch %i-th job with TC = %i to the %i-th thread\n',i,cra_cfg('get','javaTC')+1,curr)
       java_useThread(curr); 
       java_lpsProject_dispatch(lp,x,y,tol);
     end
@@ -30,7 +30,7 @@ function hulls = java_lpsProject(lps,xs,ys,tols)
     for i= sidx(iter):sidx(iter+1)-1
       x = xs{i}; y = ys{i}; 
       curr = mod(i,jNum); curr = curr+jNum*(curr==0);
-      fprintf('get %i-th result from the %i-th thread\n',i, curr)
+      %fprintf('get %i-th result from the %i-th thread\n',i, curr)
       java_useThread(curr);
       hulls{i} = java_lpsProject_get(x,y);
     end
