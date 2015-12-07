@@ -1,6 +1,5 @@
 package coho.common.number;
 
-//import us.altio.gmp4j.BigInteger;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -105,13 +104,11 @@ public class CohoAPR extends BasicScale implements Round {
 		}
 		
 
-		//if (numerator.getLowestSetBit() != 0 || denominator.bitCount() > 1) {	
-			BigInteger gcd = numerator.gcd(denominator);
-			if(!gcd.equals(BigInteger.ONE)){
-				numerator = numerator.divide(gcd);
-				denominator = denominator.divide(gcd);
-			}
-		//}
+		BigInteger gcd = numerator.gcd(denominator);
+		if(!gcd.equals(BigInteger.ONE)){
+			numerator = numerator.divide(gcd);
+			denominator = denominator.divide(gcd);
+		}
 		return new BigInteger[]{numerator,denominator};	
 	}
 	public CohoAPR(CohoNumber x){
