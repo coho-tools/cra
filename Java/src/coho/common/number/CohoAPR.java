@@ -1,4 +1,6 @@
 package coho.common.number;
+
+//import us.altio.gmp4j.BigInteger;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -11,6 +13,8 @@ public class CohoAPR extends BasicScale implements Round {
 	 */
 	public static final int BIAS=1023;
 	private static BigInteger[] fraction(double val){
+		if (val == 0) return new BigInteger[]{BigInteger.ZERO, BigInteger.ONE};	
+		
 		long bits = Double.doubleToLongBits(val);
 		int sign = ((bits >> 63) == 0) ? 1 : -1;
 		int exp = (int)((bits >> 52) & 0x7ffL);
@@ -21,7 +25,7 @@ public class CohoAPR extends BasicScale implements Round {
 		long frac = bits & 0x000fffffffffffffL ; 
 		if(exp!=0){//exp==0 for denormalized number
 			frac = frac | 0x0010000000000000L ;//add 1 here. 1.Signficant for normalized number
-		}		
+		}
 		int numOfZeros = Math.min(Long.numberOfTrailingZeros(frac),52);//if significant are all zeros, 64 returned for numberofTrailingZeros() function.
 		frac = frac >>> numOfZeros;//remove zeros, unsigned shift
 		
@@ -99,11 +103,15 @@ public class CohoAPR extends BasicScale implements Round {
 			numerator = numerator.negate();
 			denominator = denominator.negate();			
 		}
-		BigInteger gcd = numerator.gcd(denominator);
-		if(!gcd.equals(BigInteger.ONE)){
-			numerator = numerator.divide(gcd);
-			denominator = denominator.divide(gcd);
-		}
+		
+
+		//if (numerator.getLowestSetBit() != 0 || denominator.bitCount() > 1) {	
+			BigInteger gcd = numerator.gcd(denominator);
+			if(!gcd.equals(BigInteger.ONE)){
+				numerator = numerator.divide(gcd);
+				denominator = denominator.divide(gcd);
+			}
+		//}
 		return new BigInteger[]{numerator,denominator};	
 	}
 	public CohoAPR(CohoNumber x){
@@ -225,12 +233,8 @@ public class CohoAPR extends BasicScale implements Round {
 	 * b/a * d/c = (bd)/(ac)
 	 */
 	public CohoAPR mult(CohoAPR x){
-		BigInteger a = denominator;
-		BigInteger b = numerator;
-		BigInteger c = x.denominator;
-		BigInteger d = x.numerator;		
-		BigInteger denominator = a.multiply(c);
-		BigInteger numerator = b.multiply(d);
+		BigInteger denominator = this.denominator.multiply(x.denominator);
+		BigInteger numerator = this.numerator.multiply(x.numerator);
 		return create(numerator,denominator);
 	}
 	public CohoAPR div(CohoAPR x){

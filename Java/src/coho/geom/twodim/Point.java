@@ -187,10 +187,11 @@ public class Point implements GeomObj2,Comparable<Point> {
 		CohoNumber ax = a.x(), ay = a.y();
 		CohoNumber bx = b.x(), by = b.y();
 		CohoNumber cx = c.x(), cy = c.y();
-		CohoNumber det1 = ax.mult(by).add(bx.mult(cy)).add(cx.mult(ay));//ax*by+bx*cy+cx*ay
-		CohoNumber det2 = ax.mult(cy).add(bx.mult(ay)).add(cx.mult(by));//ax*cy+bx*ay+cx*by
-		return det1.compareTo(det2);//det1-det2 is the area. left turn if area  is positive. 		
+		CohoNumber det1 = ax.sub(cx).mult(by.sub(cy));
+		CohoNumber det2 = bx.sub(cx).mult(ay.sub(cy));
+		return det1.compareTo(det2);
 	}
+
 	private static int hybridTurn(Point a, Point b, Point c){
 		//For double, we don't want to have incorrect answer because of round off error.
 		if( (a.type==CohoDouble.type || b.type==CohoDouble.type || c.type==CohoDouble.type)&&

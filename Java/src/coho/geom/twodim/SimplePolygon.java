@@ -410,27 +410,12 @@ public class SimplePolygon implements Polygon {
 		return convexHull(points,false);
 	}
 	public static ConvexPolygon convexHull(Point[] points, boolean fix){
-		//Graham's Algorithm
-		final class thetaComparator implements Comparator<Point>{
-			Point p;
-			boolean cmpLength =false;//sort by the length if angle is equal;
-			public thetaComparator(Point p){
-				this.p = p;
-			}
-			public thetaComparator(Point p, boolean cmpLength){
-				this.p = p;
-				this.cmpLength = cmpLength; 
-			}
-			//CONSIDER: If they equals, the near one can be removed.
-			//DONE: Put the nearest point before. remove outside;
-			public int compare(Point p1, Point p2){
-				Segment seg1 = Segment.create(p, p1);
-				Segment seg2 = Segment.create(p, p2);
-				int result =  seg1.compareByAngle(seg2);
-				if(result==0 && cmpLength){
-					result = seg1.len2().compareTo(seg2.len2());//longer distance is larger
-				}
-				return result;
+		// Andrew's algorithm
+		final class xComparator implements Comparator<Point> {
+			public int compare(Point p1, Point p2) {
+				int res = p1.y().compareTo(p2.y());
+				if (res == 0) return p1.x().compareTo(p2.x());
+				return res;
 			}
 		};
 		
@@ -438,28 +423,17 @@ public class SimplePolygon implements Polygon {
 		if(n<3){
 			throw new GeomException("Convex.Hull requires more than 3 points");
 		}
-		//step1: Let p0 be the point in poly with the minimum y-coordinate
-		//       or the leftmost such point in case of a tie.
-		Point p0 = points[0];
-		for(int i=1; i<n; i++){
-			Point p = points[i];
-			int cmp = p.y().compareTo(p0.y());
-			if(cmp<0 || ((cmp==0)&&(p.x().compareTo(p0.x())<0)) ){
-				p0 = p;
-			}
-		}
 
-		//step2: sort all points by the angle
+		//step2: sort all points by x
 		//CONSIDER: what if there are duplicated p0 in the polygon. 
 		//The sort will put them in the beginning of the array.
 		//DONE: We modify SimplePolygon and make sure there is no repeated point
 		//NOTE The sort function sort the points by angle, if tie, sort by the distance to p0;
-		Arrays.sort(points, 0, n, new thetaComparator(p0,true));
+		Arrays.sort(points, 0, n, new xComparator());
 
 		//NOTE: sort by angle only and remove corresponding points.
-		Comparator<Point> cmp = new thetaComparator(p0);
+		Comparator<Point> cmp = new xComparator();
 		ArrayList<Point> ptsList = new ArrayList<Point>(n);
-		//ptsList.add(p0);//p0 is the first one
 		//FIXED if p0==p1(p0 and p1 are the same points). We should remove p1/p0
 		for(int i=0; i<n;i++){//the last one must be kept
 			if(cmp.compare(points[i], points[(i+1)%n])!=0){
@@ -501,19 +475,27 @@ public class SimplePolygon implements Polygon {
 		//because we didn't remove points that has same angle.
 		//DONE: find the first three points that are of left turn
 		ArrayList<Point> stack = new ArrayList<Point>();
-		stack.add(points[0]);
-		stack.add(points[1]);
-		stack.add(points[2]);
 		
-		//step4: find left turn point continous
-		for(int i=3; i<n; i++){
+		//step4: find lower hull
+		for(int i=0; i<n; i++){
 			Point curr = points[i];
-			while(!Point.isLeftTurn(stack.get(stack.size()-2),stack.get(stack.size()-1),curr)){
+			while(stack.size() >= 2 && !Point.isLeftTurn(stack.get(stack.size()-2),stack.get(stack.size()-1),curr)){
 				stack.remove(stack.size()-1);				
 			}
 			stack.add(curr);
 		}
-		return new ConvexPolygon(stack,false);//BUG, duplicated point?
+		
+		int sz = stack.size();
+		for(int i=n-2; i>=0; i--){
+			Point curr = points[i];
+			while(stack.size() >= sz+1 && !Point.isLeftTurn(stack.get(stack.size()-2),stack.get(stack.size()-1),curr)){
+				stack.remove(stack.size()-1);				
+			}
+			stack.add(curr);
+		}
+		
+		if (stack.size() > 1) stack.remove(stack.size()-1);
+		return new ConvexPolygon(stack,false);
 	}
 	
 	public ConvexPolygon convexHull(){
