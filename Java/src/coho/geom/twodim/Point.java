@@ -22,6 +22,7 @@ import coho.geom.*;
  *  
  */
 public class Point implements GeomObj2,Comparable<Point> {
+	public static double eps = 1e-8;
 	private final CohoNumber x, y;
 	private final CohoType type;//the representation of Point
 	public double doubleX(){return x.doubleValue();}
@@ -187,6 +188,21 @@ public class Point implements GeomObj2,Comparable<Point> {
 		CohoNumber ax = a.x(), ay = a.y();
 		CohoNumber bx = b.x(), by = b.y();
 		CohoNumber cx = c.x(), cy = c.y();
+		
+		// Try this in doubles first.
+		double dax = ax.doubleValue(), day = ay.doubleValue();
+		double dbx = bx.doubleValue(), dby = by.doubleValue();
+		double dcx = cx.doubleValue(), dcy = cy.doubleValue();
+		
+		double ddet1 = (dax-dcx) * (dby-dcy), ddet2 = (dbx-dcx) * (day-dcy);
+		double relval = (ddet1-ddet2)/Math.max(ddet1, ddet2);
+		if (Math.abs(relval) > Point.eps) {
+			if (ddet1 < ddet2) return -1;
+			else if (ddet1 > ddet2) return 1;
+			return 0;
+		}
+		
+		// Then try in APR if necessary		
 		CohoNumber det1 = ax.sub(cx).mult(by.sub(cy));
 		CohoNumber det2 = bx.sub(cx).mult(ay.sub(cy));
 		return det1.compareTo(det2);
