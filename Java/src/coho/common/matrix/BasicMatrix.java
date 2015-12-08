@@ -498,7 +498,11 @@ public class BasicMatrix<V extends CohoNumber> implements Matrix{
 			throw new MatrixError("The input matrix must be a vector");
 		BasicMatrix<V> r = convert(row.length(),ncols);
 		for(int i=0; i<row.length(); i++){
-			r.assign(row(row.V(i).intValue()),i,0);
+			if (ncols == 1) {
+				r.assign(V(row.V(i).intValue(), 0), i, 0);
+			} else {
+				r.assign(row(row.V(i).intValue()),i,0);
+			}
 		}
 		return r;
 	}
@@ -514,7 +518,11 @@ public class BasicMatrix<V extends CohoNumber> implements Matrix{
 			throw new MatrixError("The input matrix must be a vector");
 		BasicMatrix<V> r = convert(nrows,col.length());
 		for(int j=0; j<col.length(); j++){
-			r.assign(col(col.V(j).intValue()),0,j);
+			if (nrows == 1) {
+				r.assign(V(0, col.V(j).intValue()), 0, j);
+			} else {
+				r.assign(col(col.V(j).intValue()),0,j);
+			}
 		}
 		return r;
 	}
