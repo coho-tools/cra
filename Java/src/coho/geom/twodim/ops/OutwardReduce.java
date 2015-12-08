@@ -295,7 +295,7 @@ public class OutwardReduce{
 		this.pointReducible = pointReducible;
 		this.edgeReducible = edgeReducible;
 		type = poly.type();
-		area = poly.area().doubleValue();		
+		area = poly.doubleArea();		
 
 		//remove colinear point
 		int n = poly.degree();
@@ -342,7 +342,7 @@ public class OutwardReduce{
 		this.pointReducible = false;
 		this.edgeReducible = true;
 		type = poly.type();
-		area = poly.area().doubleValue();		
+		area = poly.doubleArea();		
 
 		//remove colinear point
 		int n = poly.degree();

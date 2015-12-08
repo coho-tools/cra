@@ -198,6 +198,18 @@ public class SimplePolygon implements Polygon {
 		}
 		return result.div(2);
 	}
+
+	public double doubleArea(){
+		double result = 0;
+		for (int i=0; i<points.length; i++){
+			double x_i = points[i].x().doubleValue();
+			double y_i = points[i].y().doubleValue();
+			double x_inc = points[(i+1)%points.length].x().doubleValue();
+			double y_inc = points[(i+1)%points.length].y().doubleValue();
+			result = result + (x_i * y_inc - x_inc * y_i);
+		}
+		return result/2.0;
+	}
 	
 	public boolean isConvex( int i){
 		int n = degree();
