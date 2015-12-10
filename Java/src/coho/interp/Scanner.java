@@ -15,7 +15,7 @@ import java.io.*;
 
 
 public class Scanner implements java_cup.runtime.Scanner {
-	private final int YY_BUFFER_SIZE = 512;
+	private final int YY_BUFFER_SIZE = 8 * 1024;
 	private final int YY_F = -1;
 	private final int YY_NO_STATE = -1;
 	private final int YY_NOT_ACCEPT = 0;

@@ -12,11 +12,15 @@ while 1
     if ~isempty(RPARpos)
         text = cellstr(cell2mat(text));
 	text = text{1};
-    	RPARpos = findstr(text, ')' );
-        LPARpos = findstr(text, '(' );
-        text = [ 'A = ' text(LPARpos+1:RPARpos-1) ';'];
-        eval(java_hex2num(text));
-        break;
+    	
+	% old slower code which relied on matlab eval
+	%RPARpos = findstr(text, ')' );
+        %LPARpos = findstr(text, '(' );
+        %text = [ 'A = ' text(LPARpos+1:RPARpos-1) ';'];
+        %eval(java_hex2num(text));
+        
+	A = to_matrix(text);
+	break;
     end
 
     text{i} = java_readLine;

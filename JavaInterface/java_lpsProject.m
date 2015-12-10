@@ -12,7 +12,7 @@ function hulls = java_lpsProject(lps,xs,ys,tols)
   jNum = cra_cfg('get','javaThreads');
 
   % the input buffer can not hold too many requests 
-  cap = jNum*50;
+  cap = jNum*5;
   sidx = [1:cap:N,N+1];
 
   for iter = 1:length(sidx)-1
