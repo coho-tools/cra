@@ -1,7 +1,7 @@
 % Using CRA on the helicopter demo
 function test 
   %for jNum = [1,2,4,8,16]
-  for jNum = 8 
+  for jNum = 16 
     cra_cfg('set','javaThreads',jNum);
     heli
   end
