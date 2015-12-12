@@ -921,7 +921,7 @@ public class BasicMatrix<V extends CohoNumber> implements Matrix{
      */
     public static final int nStandardLength = 16;
     public String stringify(Object fmt) {
-    	StringBuffer buf = new StringBuffer();
+    	StringBuffer buf = new StringBuffer(1024);
     	buf.append(matOpener);
     	for (int i = 0; i < nrows(); i++) {
     		buf.append(rowOpener);
@@ -933,18 +933,11 @@ public class BasicMatrix<V extends CohoNumber> implements Matrix{
     				double d = e.doubleValue();
     				if ((fmt != null) && (fmt instanceof String) && (((String) (fmt)).compareTo("hex") == 0)) {
     					s = "$"+ MoreLong.toHexString(Double.doubleToLongBits(d));
-//    					s = "$";
-//    					String l = Long.toHexString(Double.doubleToLongBits(d));
-//    					for(int k=0; k<nStandardLength-l.length();k++)
-//    						s+='0';
-//    					s+=l;
     				}else{
     					// force all doubles printed as decimal to be same width
     					// by prepending blanks; this makes reading easier;
     					int nBlanks = DDWidth - s.length();
                         s = MoreString.multiply(" ", nBlanks) + s;
-//    					for(int k=0; k<nBlanks; k++)
-//    						s = " "+s;
     				}
     			}
     			buf.append(s);
@@ -958,19 +951,21 @@ public class BasicMatrix<V extends CohoNumber> implements Matrix{
     }
 
     public String toMatlab(){
-		String matlab = "A=[\n";
+		StringBuffer matlab = new StringBuffer(16 * 1024);
+		matlab.append("A=[\n");
 		for (int row=0; row<nrows();row++){		
 			for(int col=0; col<ncols(); col++){				
-				matlab += V(row,col).toString();
+				matlab.append(V(row,col).toString());
 				if(col!=ncols-1)
-					matlab +=",";
+					matlab.append(",");
 			}
 			if(row!=nrows-1)
-				matlab +=";\n"; 
+				matlab.append(";\n"); 
 		}
-		matlab += "\n];";
-		return matlab;
+		matlab.append("\n];");
+		return matlab.toString();
     }
+
     public static void main(String[] argv){
 		BasicMatrix<CohoInteger> a = new BasicMatrix<CohoInteger>(CohoInteger.type, 1, 1);
 //		System.out.println(a = a.fill(5));

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.io.BufferedReader;
 import java.io.Writer;
 /**
  * This reader copy the input to a log file, which is useful for debug
@@ -26,7 +27,7 @@ public class CopyingReader extends Reader {
 		log = _log;
 	}
 	public CopyingReader(InputStream in_str, Writer _log) {
-		this(new InputStreamReader(in_str), _log);
+		this(new BufferedReader(new InputStreamReader(in_str)), _log);
 	}
 
 	String line = "";

@@ -103,10 +103,13 @@ public class LPstuff {
 
 				DoubleMatrix fwd = null;
 				DoubleMatrix bwd = null;
-				if(args.size() >= 7){
+				if(args.size() >= 6){
 					fwd = MatrixValue.doubleMatrix_arg(args, 5, name());
+				}
+				if(args.size() >= 7){
 					bwd = MatrixValue.doubleMatrix_arg(args, 6, name());
 				}
+
 				if(eq.a().size(1) != ineq.a().size(1)){
 					throw new EvalException(name() +
 							":  mismatched dimensions of equality and inequality constraints");
@@ -116,10 +119,17 @@ public class LPstuff {
 					throw new EvalException(name() + ":  wrong size for pos matrix");
 				}
 
-				if (fwd != null& bwd!=null){//fwd & bwd should be null at the same time
-					if (fwd.size(0) != fwd.size(1)||bwd.size(0)!=bwd.size(1)||bwd.size(0)!=fwd.size(0)){
+				if (fwd != null){
+					if (fwd.size(0) != fwd.size(1)){
 						throw new EvalException(name() +
 								":  toActualFromWork matrix is not square");          
+					}
+
+					if (bwd != null) {
+						if (bwd.size(0)!=bwd.size(1)||bwd.size(0)!=fwd.size(0)){
+							throw new EvalException(name() +
+								":  toActualFromWork matrix is not square");          
+						}
 					}
 					if(eq.a().size(1) != fwd.size(1)) {
 						throw new EvalException(name() +

@@ -636,7 +636,11 @@ public class BasicCohoSolver implements CohoSolver{
 			switch(status){
 			case OK:
 			case POSSIBLEOK:
-				result = new CohoSolverResult(status, cohoCost(point),optBasis,point);
+				if (lp().bwd() == null) {
+					result = new CohoSolverResult(status, cohoCost(optBasis),optBasis,point);
+				} else {	
+					result = new CohoSolverResult(status, cohoCost(point),optBasis,point);
+				}
 			default:
 				//return null;
 			}

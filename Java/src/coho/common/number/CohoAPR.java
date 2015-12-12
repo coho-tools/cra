@@ -93,21 +93,53 @@ public class CohoAPR extends BasicScale implements Round {
 //		BigInteger denominator = new BigInteger(1,denom);
 //		return new BigInteger[]{numerator,denominator};
 //	}
+
+	private long binaryGCD(long a, long b) {
+		if (b == 0) return a;
+		if (a == 0) return b;
+		
+		long shift = 0;
+		for (shift = 0; ((a|b)&1)==0; ++shift) {
+			a >>= 1;
+			b >>= 1;
+		}
+
+		while ((a&1) == 0) a >>= 1;
+		
+		do {
+			while ((b&1) == 0) b >>= 1;
+			if (a > b) {
+				long t = b; 
+				b = a; 
+				a = t;
+			}
+			b = b - a;
+		} while (b != 0);
+		return a << shift;
+	}
 	
 	private BigInteger[] normalize(BigInteger numerator, BigInteger denominator){
 		if(denominator.equals(BigInteger.ZERO))
 			throw new ArithmeticException("Zero divisor");
 			//return this; //_numerator.compareTo(BigInteger.ZERO);//throw new ArithmeticException("Zero divisor");
-		if(denominator.compareTo(BigInteger.ZERO)<0){
+		if(denominator.signum()<0){
 			numerator = numerator.negate();
 			denominator = denominator.negate();			
 		}
 		
-
-		BigInteger gcd = numerator.gcd(denominator);
-		if(!gcd.equals(BigInteger.ONE)){
-			numerator = numerator.divide(gcd);
-			denominator = denominator.divide(gcd);
+		if (Math.max(numerator.bitLength(), denominator.bitLength()) < 64) {
+			long nu = numerator.longValue(), de = denominator.longValue();
+			long gcd = binaryGCD(Math.abs(nu), de);
+			if (gcd != 1) {
+				numerator = BigInteger.valueOf(nu/gcd);
+				denominator = BigInteger.valueOf(de/gcd);
+			}
+		} else {
+			BigInteger gcd = numerator.gcd(denominator);
+			if(!gcd.equals(BigInteger.ONE)){
+				numerator = numerator.divide(gcd);
+				denominator = denominator.divide(gcd);
+			}
 		}
 		return new BigInteger[]{numerator,denominator};	
 	}
@@ -132,10 +164,17 @@ public class CohoAPR extends BasicScale implements Round {
 	public CohoAPR(Number numerator, Number denominator){
 		this(BigInteger.valueOf(numerator.longValue()), BigInteger.valueOf(denominator.longValue()));
 	}
+	
 	public CohoAPR(BigInteger numerator, BigInteger denominator){
-		BigInteger[] temp = normalize(numerator, denominator);
-		numerator = temp[0];
-		denominator = temp[1];
+		this(numerator, denominator, true);
+	}
+	
+	public CohoAPR(BigInteger numerator, BigInteger denominator, boolean reduce){
+		if (reduce) {
+			BigInteger[] temp = normalize(numerator, denominator);
+			numerator = temp[0];
+			denominator = temp[1];
+		}
 		this.numerator = numerator;
 		this.denominator = denominator;
 	}
@@ -198,11 +237,11 @@ public class CohoAPR extends BasicScale implements Round {
 		return numerator.signum()>=0?this:create(numerator.abs(),denominator);
 	}
 	public CohoAPR negate(){
-		return create(numerator.negate(),denominator);
+		return new CohoAPR(numerator.negate(),denominator, false);
 	}
 	public CohoAPR recip(){
-		return create(denominator,numerator);
-	}
+		return new CohoAPR(denominator, numerator, false);
+	}	
 	/*
 	 * This is not supported, because the square root of APR is no long a APR. 
 	 * To get the approximation, convert it to CohoDouble the compute the sqrt of it.
@@ -244,9 +283,9 @@ public class CohoAPR extends BasicScale implements Round {
 		return compareTo(x)<0?this:x;
 	}
 	public int compareTo(CohoAPR x){
-    	BigInteger bc = this.numerator.multiply(x.denominator);
-    	BigInteger ad = this.denominator.multiply(x.numerator);
-    	return bc.compareTo(ad);
+    		BigInteger bc = this.numerator.multiply(x.denominator);
+    		BigInteger ad = this.denominator.multiply(x.numerator);
+    		return bc.compareTo(ad);
 	}
 	
 	public long longValue(){
