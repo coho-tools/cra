@@ -127,7 +127,7 @@ public class CohoAPR extends BasicScale implements Round {
 			denominator = denominator.negate();			
 		}
 		
-		if (Math.max(numerator.bitLength(), denominator.bitLength()) < 64) {
+		if (Math.max(numerator.bitLength(), denominator.bitLength()) < 62) {
 			long nu = numerator.longValue(), de = denominator.longValue();
 			long gcd = binaryGCD(Math.abs(nu), de);
 			if (gcd != 1) {

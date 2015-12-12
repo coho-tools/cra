@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "mex.h"
 
@@ -20,6 +21,11 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		unsigned long long i;
 		double    d;
 	} value;
-	value.i = strtoull(res, NULL, 16);
+	int len = strlen(res), i;
+	char hstr[18];
+	for (i = 0; i < len; i++) hstr[i] = res[i];
+	while (len < 16) hstr[len++] = '0';
+	hstr[len] = '\0';
+	value.i = strtoull(hstr, NULL, 16);
 	plhs[0] = mxCreateDoubleScalar(value.d);
 }

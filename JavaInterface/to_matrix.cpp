@@ -23,7 +23,12 @@ void mexFunction ( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		if (token[0] == ';') mat.push_back(vector<double>());
 		while (*token  && *token != '$') token++;
 		sscanf(token, "$%s", hstr);
-		
+	
+		int len = strlen(hstr);
+		if (len < 16) {
+			while (len < 16) hstr[len++] = '0';
+			hstr[len] = '\0';
+		}	
 		if (*token) {
 			value.i = strtoull(hstr, NULL, 16);
 			mat.back().push_back(value.d);
