@@ -95,7 +95,7 @@ public class LP{
 		if(fwd.nrows()!=nVars()||fwd.ncols()!=nVars()){
 			throw new LPError("LP.setT(): fwd should be a "+nVars()+" by "+nVars()+"matrix. But it's "+fwd.nrows()+" by "+fwd.ncols()+" matrix");
 		}
-		if(bwd.nrows()!=nVars()||bwd.ncols()!=nVars()){
+		if(bwd != null && (bwd.nrows()!=nVars()||bwd.ncols()!=nVars())){
 			throw new LPError("LP.setT(): bwd should be a "+nVars()+" by "+nVars()+"matrix. But it's "+bwd.nrows()+" by "+bwd.ncols()+" matrix");
 		}
 		this.fwd=fwd;
@@ -115,7 +115,7 @@ public class LP{
 		this.vars=vars;
 		if(c!=null)
 			setC(c);
-		if(fwd!=null&&bwd!=null)
+		if(fwd!=null)
 			setWd(fwd,bwd);
 	}		
 	public LP(Constraint eq, Constraint neq, BooleanMatrix vars, Matrix c){

@@ -51,26 +51,22 @@ public class APRDoubleHybridCohoSolver extends BasicCohoSolver {
 			 * find new column
 			 * A new efficient method to compute relativecost, see pp83-84 @ master thesis.
 			 */
-			int newCol = 0;
+			int newCol = ncols;
 			Matrix cb =doubleC.row(currBasis.basis());
 			Matrix d = B.transpose().getSolution(cb).transpose();
 			CohoNumber relativeCost = null;
-			for(;newCol<ncols;newCol++){//we don't want to introduce the added column
-				if(basis.V(newCol).booleanValue())
+			CohoNumber bestRelCost = null;
+			for(int col = 0; col < ncols; col++){//we don't want to introduce the added column
+				if(basis.V(col).booleanValue())
 					continue;	//skip if it is in the basis, it's can't be the new basic column
 				
 				// compute d*Aj
-				CohoNumber ctj = doubleA.col(newCol).dotProd(d); //use cohoMatrix dotProd
-				//CohoMatrix Aj = doubleA.convert(doubleA.col(newCol),true);
-//				CohoMatrix Aj = (CohoMatrix)doubleA.col(newCol);
-//				java.util.ArrayList<Integer> pos = Aj.rowsAtCol()[0];
-//				CohoNumber ctj = d.V(pos.get(0)).mult(Aj.V(pos.get(0)));
-//				if(pos.size()>1)
-//					ctj = ctj.add(  d.V(pos.get(1)).mult(Aj.V(pos.get(1)))  );
+				CohoNumber ctj = doubleA.col(col).dotProd(d); //use cohoMatrix dotProd
 				
-				relativeCost = doubleC.V(newCol).sub(ctj);
-				if(relativeCost.compareTo(0)<0){
-					break;
+				relativeCost = doubleC.V(col).sub(ctj);
+				if(relativeCost.compareTo(0)<0 && (bestRelCost == null || relativeCost.compareTo(bestRelCost) < 0)){
+					newCol = col;
+					bestRelCost = relativeCost;
 				}//if relativeCost = 0; it is degeneracy, we have get the optimal one. we don't want to continue it anymore
 			}			
 			if(newCol==ncols){//it may not be optimal
@@ -79,9 +75,7 @@ public class APRDoubleHybridCohoSolver extends BasicCohoSolver {
 				}else{
 					return super.pivot(currBasis);
 				}
-				//return super.pivot(currBasis);
 			}
-				//return null;
 			/*
 			 * find column to be evicted out
 			 */
@@ -103,31 +97,15 @@ public class APRDoubleHybridCohoSolver extends BasicCohoSolver {
 			//This might be or not be unbounded LP
 			if(evictBasis<0){//unbounded all tj is nonpositive for cj < 0
 				return super.pivot(currBasis);
-				//throw new UnboundedLPError("APRDoubleHybridCohoSolver.pivot(): The lp is unbouned using double, try to use apr");
 			}
 			//cohoDualFeasible is faster than reduceCost
 			int removeCol = currBasis.basis().V(evictBasis).intValue();
 			LPBasis newBasis = currBasis.replace(removeCol,newCol,LPBasis.BasisStatus.UNKNOWN,LPBasis.BasisStatus.UNKNOWN);			
-			//if(cohoDualFeasible(newBasis) && reduceCost(currBasis,newCol,evictBasis).less(0)){
 			if(costReduced(currBasis,newCol,evictBasis) && cohoDualFeasible(newBasis)){
 				return newBasis;
 			}else{
 				return super.pivot(currBasis);
 			}
-			
-//			//compute the reduce cost using interval to check. 
-//			if(reduceCost(currBasis,newCol,evictBasis).less(0)){
-//				int removeCol = currBasis.basis().V(evictBasis).intValue();// get the column number of the i^th of current basis.
-//				//The basis could be infeasible or even not inveritable. Therfore, *Feasible function must handle the SingularMatrixException. 
-//				LPBasis newBasis = currBasis.replace(removeCol,newCol,LPBasis.BasisStatus.UNKNOWN,LPBasis.BasisStatus.UNKNOWN);
-//				if(cohoDualFeasible(newBasis)){
-//					return newBasis;
-//				}else{
-//					return super.pivot(currBasis);
-//				}
-//			}else{//check fail
-//				return super.pivot(currBasis);
-//			}
 		}catch(SingularMatrixException e){
 			//The basis found by double might be invertiable, therefore, it is possible to throw a SingularMatrixException.
 			//reduceCost here will not throw SingularMatrixException, because if the basis is not inveritable, the exception is throw before.

@@ -6,16 +6,9 @@ function text = java_hex2num(text, hexMarker)
 % the bin hex representation is expected to contain exactly 16 chars;
 
 if nargin < 2
-    hexMarker = '$';
+    hexMarker = '\$';
 end
 
-while 1
-    hexMarkerPos = findstr(text, hexMarker);
-    if isempty(hexMarkerPos)
-        break;
-    end
-    before = text(1:hexMarkerPos-1);
-    numberAsHex = text(hexMarkerPos+1:hexMarkerPos+16);
-    after = text(hexMarkerPos+17:end);
-    text = [ before 'hex2num(''' numberAsHex ''')' after ];
-end
+regex = [hexMarker '([0-9a-f]+)'];
+rep = 'fasthex2num(''$1'')';
+text = regexprep(text, regex, rep);

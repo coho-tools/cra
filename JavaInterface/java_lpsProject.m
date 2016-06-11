@@ -54,9 +54,11 @@ function java_lpsProject_dispatch(lp, x, y,tol)
   java_writeMatrix(beq,'beq');
   java_writeBoolMatrix(pos,'pos'); % x[pos] >= 0?
   if(~isempty(bwd))
-	  java_writeMatrix(bwd,'bwd'); % bwdT
 	  java_writeMatrix(fwd,'fwd'); % fwdT 
-	  java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,fwd,bwd);'); 
+	  % if no bwd is given, coho will use fwd alone to compute the costs. this speeds up IO
+	  %java_writeMatrix(bwd,'bwd'); % bwdT
+	  %java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,fwd,bwd);'); 
+	  java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos,fwd);'); 
   else
   	java_writeLine('lp = lpGeneral(Aeq, beq, A, b, pos);'); 
   end

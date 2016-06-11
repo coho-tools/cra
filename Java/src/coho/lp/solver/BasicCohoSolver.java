@@ -268,16 +268,18 @@ public class BasicCohoSolver implements CohoSolver{
 			 * find new column
 			 * A new efficient method to compute relativecost, see pp83-84 @ master thesis.
 			 */
-			int newCol = 0;
+			int newCol = ncols;
 			Matrix cb =dualC.row(currBasis.basis());
 			Matrix d = B.transpose().getSolution(cb).transpose();
 			CohoNumber relativeCost = null;
-			for(;newCol<ncols;newCol++){//we don't want to introduce the added column
-				if(basis.V(newCol).booleanValue())
+			CohoNumber bestRelCost = null;
+
+			for(int col = 0; col < ncols; col++){//we don't want to introduce the added column
+				if(basis.V(col).booleanValue())
 					continue;	//skip if it is in the basis, it's can't be the new basic column
 				
 				// compute d*Aj
-				CohoNumber ctj = dualA.col(newCol).dotProd(d); //use cohoMatrix dotProd
+				CohoNumber ctj = dualA.col(col).dotProd(d); //use cohoMatrix dotProd
 				//CohoMatrix Aj = dualA.convert(dualA.col(newCol),true);
 //				CohoMatrix Aj = (CohoMatrix)dualA.col(newCol);
 //				ArrayList<Integer> pos = Aj.rowsAtCol()[0];
@@ -285,10 +287,11 @@ public class BasicCohoSolver implements CohoSolver{
 //				if(pos.size()>1)
 //					ctj = ctj.add(  d.V(pos.get(1)).mult(Aj.V(pos.get(1)))  );
 				
-				relativeCost = dualC.V(newCol).sub(ctj);
+				relativeCost = dualC.V(col).sub(ctj);
 				//System.out.println("newCol"+newCol+"relativeCost"+relativeCost);
-				if(relativeCost.compareTo(0)<0){
-					break;
+				if(relativeCost.compareTo(0)<0 && (bestRelCost == null || relativeCost.compareTo(bestRelCost) < 0)){
+					newCol = col;
+					bestRelCost = relativeCost;
 				}//if relativeCost = 0; it is degeneracy, we have get the optimal one. we don't want to continue it anymore
 			}			
 			if(newCol==ncols){//it's the optimal already.

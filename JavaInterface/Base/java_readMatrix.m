@@ -4,20 +4,31 @@ function A = java_readMatrix
 % we rely on the fact that the matrix contents proper
 % is between '(' and ')';
 %
-text = java_readLine;
+text = {java_readLine};
+i = 2;
+
 while 1
-    RPARpos = findstr(text, ')' );
+    RPARpos = findstr(text{i-1}, ')' );
     if ~isempty(RPARpos)
-        LPARpos = findstr(text, '(' );
-        text = text(LPARpos+1:RPARpos-1);
-        text = [ 'A = ' text ';'];
-        text = java_hex2num(text);
-        eval(text);
-        break;
+        text = cellstr(cell2mat(text));
+	text = text{1};
+    
+	if ~isempty(findstr(text,'matrix')) && ~isempty(findstr(text, '$'))
+		% to_matrix assumes the text is a hex matrix. do not use otherwise.
+		A = to_matrix(text);
+	else
+		% old slower code which relied on matlab eval
+		RPARpos = findstr(text, ')' );
+        	LPARpos = findstr(text, '(' );
+        	text = [ 'A = ' text(LPARpos+1:RPARpos-1) ';'];
+        	eval(java_hex2num(text));
+        end
+	break;
     end
-	line = java_readLine;
-    if (isnumeric(line) && line < 0) 
+
+    text{i} = java_readLine;
+    if (isnumeric(text{i}) && text{i} < 0) 
 		error('java_readMatrix: unexpected end of file');
     end
-    text = [text ' ' line];
+    i = i+1;
 end
