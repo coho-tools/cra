@@ -100,6 +100,13 @@ function fwdLP = int_forward(lp,ldi,t,method)
 	q = q + PP*mc*b+ints;
 	fwdLP = lp_create(P,q);
 	fwdLP.bwd = Eo*E; fwdLP.fwd = invEo*invE;
+
+%  global debug
+%  d.A = A; 
+%  d.t = t;
+%  d.E = E;
+%  d.invE = invE;
+%  debug{end+1} = d;
 end
 
 function v = int_inv(A,t0,t1)

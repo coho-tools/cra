@@ -8,11 +8,16 @@ opt.tstepL = 0.01;
 opt.tstepS = 0.01;
 opt.maxu = 0.2; 
 % CRA's behavior, projecting each time
-phs = ph_advance(ph,@(bbox)(ex_2vdp_model(bbox)), opt,1);
-for i=1:length(phs)
-  polys{i} = phs{i}.hulls{1};
-end
-polys_display(polys,'g');
+%phs = ph_advance(ph,@(bbox)(ex_2vdp_model(bbox)), opt,1);
+%for i=1:length(phs)
+%  polys{i} = phs{i}.hulls{1};
+%end
+%polys_display(polys,'g');
+%
+global debug 
+debug = {};
+global model 
+model = {};
 % New behavior, no projecting
 phs = ph_advance(ph,@(bbox)(ex_2vdp_model(bbox)), opt,0);
 for i=1:length(phs)
@@ -34,4 +39,8 @@ function ldi = ex_2vdp_model(bbox)
 		   extras(y)^3+3/2*abs(avgs(y))*extras(y)^2]; 
   u = 0; 
 	ldi = int_create(A,b,u); 
+%  global model
+%  m.bbox=bbox;
+%  m.A = A;
+%  model{end+1} = m;
 

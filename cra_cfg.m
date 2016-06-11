@@ -84,7 +84,8 @@ function cfg = cra_cfg_default
 
 	% tolerence. 
 	tol = 1e-6;
-	javaFormat = 'hex';
+	%javaFormat = 'hex';
+	javaFormat = 'dec';
   javaThreads = 2;
 
   cfg = struct('lpSolver', lpSolver, 'projSolver', projSolver, ...
