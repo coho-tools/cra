@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.io.BufferedReader;
 /**
  * A reader which output prompt to err when there is error.
  * @author chaoyan
@@ -22,7 +23,7 @@ public class PromptingReader extends Reader {
 		in = new LineNumberReader(_in);
 	}
 	public PromptingReader(InputStream in_str) {
-		this(new InputStreamReader(in_str));
+		this(new BufferedReader(new InputStreamReader(in_str)));
 	}
 
 	public PromptingReader setPrompt(String p) {

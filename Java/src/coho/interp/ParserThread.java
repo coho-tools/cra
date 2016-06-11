@@ -21,7 +21,7 @@ public class ParserThread extends Parser implements Parse, Runnable {
 	
 	public ParserThread(Reader _in, PTfactory _pf, BlockingQueue<PTeval> q, SymbolName _sname) {
 		super();
-		if(_in == null) _in = new InputStreamReader(System.in);
+		if(_in == null) _in = new BufferedReader(new InputStreamReader(System.in));
 		if(_pf == null) _pf = new PTnodeFactory();
 		if(_sname == null) _sname = new SymbolName();
 		in = _in;

@@ -22,6 +22,7 @@ import coho.geom.*;
  *  
  */
 public class Point implements GeomObj2,Comparable<Point> {
+	public static double eps = 1e-8;
 	private final CohoNumber x, y;
 	private final CohoType type;//the representation of Point
 	public double doubleX(){return x.doubleValue();}
@@ -187,10 +188,26 @@ public class Point implements GeomObj2,Comparable<Point> {
 		CohoNumber ax = a.x(), ay = a.y();
 		CohoNumber bx = b.x(), by = b.y();
 		CohoNumber cx = c.x(), cy = c.y();
-		CohoNumber det1 = ax.mult(by).add(bx.mult(cy)).add(cx.mult(ay));//ax*by+bx*cy+cx*ay
-		CohoNumber det2 = ax.mult(cy).add(bx.mult(ay)).add(cx.mult(by));//ax*cy+bx*ay+cx*by
-		return det1.compareTo(det2);//det1-det2 is the area. left turn if area  is positive. 		
+		
+		// Try this in doubles first.
+		double dax = ax.doubleValue(), day = ay.doubleValue();
+		double dbx = bx.doubleValue(), dby = by.doubleValue();
+		double dcx = cx.doubleValue(), dcy = cy.doubleValue();
+		
+		double ddet1 = (dax-dcx) * (dby-dcy), ddet2 = (dbx-dcx) * (day-dcy);
+		double relval = (ddet1-ddet2)/Math.max(ddet1, ddet2);
+		if (Math.abs(relval) > Point.eps) {
+			if (ddet1 < ddet2) return -1;
+			else if (ddet1 > ddet2) return 1;
+			return 0;
+		}
+		
+		// Then try in APR if necessary		
+		CohoNumber det1 = ax.sub(cx).mult(by.sub(cy));
+		CohoNumber det2 = bx.sub(cx).mult(ay.sub(cy));
+		return det1.compareTo(det2);
 	}
+
 	private static int hybridTurn(Point a, Point b, Point c){
 		//For double, we don't want to have incorrect answer because of round off error.
 		if( (a.type==CohoDouble.type || b.type==CohoDouble.type || c.type==CohoDouble.type)&&

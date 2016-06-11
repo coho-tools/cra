@@ -18,7 +18,7 @@ public class LineBreakingWriter extends FilterWriter {
 		linePos = 0;
 		noBreak = false;
 		closed = false;
-		buf = new StringBuffer();
+		buf = new StringBuffer(16);
 	}
 
 

@@ -18,11 +18,11 @@ public class BasicFunctions {
 	//for log file, we don't need that.
 	// enable it later if the bug happens again.
 	//private static Writer w = new PrefixFilterWriter(new OutputStreamWriter(System.out));
-	private static Writer w = new OutputStreamWriter(System.out);
+	private static Writer w = new BufferedWriter(new OutputStreamWriter(System.out));
 	private static Parse p = null;
 	private static Writer logW = null; //the output also copy to log file
-	public static void setLogWriter(FileOutputStream fos){
-		logW = new OutputStreamWriter(fos);
+	public static void setLogWriter(OutputStream fos){
+		logW = new BufferedWriter(new OutputStreamWriter(fos));
 	}
 
 	public static void setParser(Parse _p) { p = _p; }
@@ -112,8 +112,8 @@ public class BasicFunctions {
 			public String name() { return("load"); }
 			public Value eval(RCvalue args) throws EvalException {
 				String fname = BasicArgs.string_arg(args, 0, name());
-				FileReader rd;
-				try { rd = new FileReader(fname); }
+				Reader rd;
+				try { rd = new BufferedReader(new FileReader(fname)); }
 				catch (IOException e) {
 					throw new EvalException("could not open " + fname + " to read.");
 				}

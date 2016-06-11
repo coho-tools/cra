@@ -23,6 +23,9 @@ echo "====Step3: Comple C codes===="
 cd $CRA_HOME/JavaInterface/Fork
 echo "Compile C files ..."
 make
+cd $CRA_HOME/JavaInterface
+mex fasthex2num.c
+mex to_matrix.cpp
 echo "" 
 
 echo "====Step4: Check the pipe between Java and Matlab thread works correctly====" 

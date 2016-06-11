@@ -13,8 +13,8 @@ class MyParser {
 	/* a simple test method */
 	public static void main(String[] args) throws Exception {
 //		String prompt = null;
-		FileWriter logfile = null;
-		FileInputStream infile = null;
+		Writer logfile = null;
+		InputStream infile = null;
 		
 		// process command line arguments
 		for(int i = 0; i < args.length; i++) {
@@ -28,7 +28,7 @@ class MyParser {
 				else {
 					try { 
 						i++; 
-						logfile = new FileWriter(args[i]);         
+						logfile = new BufferedWriter(new FileWriter(args[i]));         
 					} catch (IOException e) {
 						System.err.println("Could not open " + args[i] + " to write.");
 						System.exit(1);
@@ -39,7 +39,7 @@ class MyParser {
 				else{
 					try{
 						i++;
-						BasicFunctions.setLogWriter(new FileOutputStream(args[i]));
+						BasicFunctions.setLogWriter(new BufferedOutputStream(new FileOutputStream(args[i])));
 					}catch(IOException e){
 						System.err.print("Could not open "+args[i]+" to write.");
 						System.exit(1);
@@ -48,7 +48,7 @@ class MyParser {
 			}else if(args[i].compareTo("<") == 0) {
 				try { 
 					i++; 
-					infile = new FileInputStream(args[i]); 
+					infile = new BufferedInputStream(new FileInputStream(args[i])); 
 				} catch (IOException e) {
 					System.err.println("Could not open " + args[i] + " to read.");
 					System.exit(1);
@@ -73,7 +73,7 @@ class MyParser {
 			in = new PromptingReader(System.in);
 		else 
 			in = new PromptingReader(new CopyingReader(System.in, logfile));
-		BlockingQueue<PTeval> q = new LinkedBlockingQueue<PTeval>(2560);
+		BlockingQueue<PTeval> q = new ArrayBlockingQueue<PTeval>(1024 * 4);
 		ParserThread pThread = new ParserThread(in, pf, q, null);
 		BasicFunctions.setParser((Parse)pThread);		
 		EvalThread eThread = new EvalThread(q);

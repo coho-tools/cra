@@ -39,7 +39,7 @@ import coho.geom.*;
 public interface GeomObj2 extends GeomObj, DataTypeInterface{
 	public static enum RoundMode{MIDDLE,LARGE,SMALL,CENTER};
 	public static RoundMode roundMode = RoundMode.MIDDLE;
-	public static final double eps = 1e-12;
+	public static final double eps = 1e-8;
 	public static final double eps2 = 1e-24;
 	public BoundingBox bbox();//each two dimenstional object should has a bounding box
 	public GeomObj2 translate(Point offset);//translate the object
